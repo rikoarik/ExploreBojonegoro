@@ -68,7 +68,7 @@
             android:resource="@array/preloaded_fonts" />
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyBm0_zF8oxKKcUiZY__ASnm6J7xb9fD6pk" />
+            android:value="YOUR API KEY" />
     </application>
 
 </manifest>
