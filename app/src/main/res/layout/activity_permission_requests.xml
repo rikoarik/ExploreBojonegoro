@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".utils.permissionrequest.PermissionRequestsActivity">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="500sp"
+        android:layout_margin="20sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/ilustrasi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ilustrasi4" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Berikan Kami Akses untuk Memudahkan Petualangan Anda"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="24sp"
+
+        android:fontFamily="@font/inter_bold"
+        android:layout_marginStart="55sp"
+        android:layout_marginEnd="55sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <TextView
+        android:id="@+id/izinkan_kam"
+        android:layout_width="match_parent"
+        android:layout_height="84dp"
+        android:alpha="0.9"
+        android:gravity="center_horizontal|top"
+        android:lineSpacingExtra="4sp"
+        android:fontFamily="@font/inter_semibold"
+        android:text="Izinkan kami mengakses peta dan lokasi Anda untuk memberikan panduan terbaik dalam menemukan tempat-tempat menakjubkan."
+        android:translationY="-2.03sp"
+        android:layout_marginStart="55sp"
+        android:layout_marginEnd="55sp"
+        android:textSize="14sp"
+        android:layout_marginTop="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btAccessLoc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="55sp"
+        android:layout_marginEnd="55sp"
+        android:layout_marginTop="10sp"
+        android:fontFamily="@font/inter_semibold"
+        android:background="@drawable/btn_rounded_blue"
+        android:text="Izinkan Akses Lokasi"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:elevation="10sp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/izinkan_kam" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nanti Saja"
+        android:layout_marginTop="16sp"
+        android:textAlignment="center"
+        android:textColor="@color/primary"
+        android:textSize="20sp"
+        android:fontFamily="@font/inter_semibold"
+        android:layout_marginStart="55sp"
+        android:layout_marginEnd="55sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btAccessLoc" />
+</androidx.constraintlayout.widget.ConstraintLayout>

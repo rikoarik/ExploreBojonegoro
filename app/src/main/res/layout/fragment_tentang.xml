@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dashboard.home.fragmentdetail.TentangFragment">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Deskripsi"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter_bold"/>
+        <TextView
+            android:id="@+id/descTxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/grey"
+            android:fontFamily="@font/inter_medium"
+            android:justificationMode="inter_word"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Fasilitas"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter_bold"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcFasilitas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            tools:itemCount="6"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Lain - Lain"
+            android:textColor="@color/black"
+            android:fontFamily="@font/inter_bold"/>
+        <ListView
+            android:id="@+id/listLainLain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</FrameLayout>

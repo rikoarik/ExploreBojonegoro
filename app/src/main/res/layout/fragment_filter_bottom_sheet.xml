@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:elevation="20sp">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:src="@drawable/home_indicator"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_margin="10dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_filter"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filter"
+            android:layout_weight="1"
+            android:layout_marginStart="10sp"
+            android:fontFamily="@font/inter_medium"
+            android:textColor="@color/black"
+            android:textSize="19sp"/>
+        <ImageView
+            android:id="@+id/btnCancel"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_close"/>
+
+    </LinearLayout>
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       android:layout_margin="10dp"
+       android:orientation="vertical">
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Kategori"
+           android:layout_marginTop="10sp"
+           android:fontFamily="@font/inter_medium"
+           android:textColor="@color/black"
+           android:textSize="19sp"/>
+
+       <Spinner
+           android:id="@+id/spinnerCategory"
+           style="@android:style/Widget.Material.Spinner"
+           android:layout_width="match_parent"
+           android:layout_height="40dp"
+           android:layout_marginTop="10sp"
+           android:hint="Pilih Kategori" />
+
+       <!-- Jarak -->
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Jarak Maksimal (Km)"
+           android:layout_marginTop="10sp"
+           android:fontFamily="@font/inter_medium"
+           android:textColor="@color/black"
+           android:textSize="19sp"/>
+
+       <com.warkiz.widget.IndicatorSeekBar
+           android:id="@+id/jarakMax"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           app:isb_max="100"
+           app:isb_min="0"
+           app:isb_progress="0"
+           app:isb_seek_smoothly="true"
+           app:isb_show_thumb_text="true"
+           app:isb_tick_marks_color="@color/primary"
+           app:isb_thumb_text_color="@color/black"
+           app:isb_show_tick_marks_type="divider"
+           app:isb_tick_marks_size="13dp"
+           app:isb_show_tick_texts="true"
+           app:isb_tick_texts_size="15sp"
+           app:isb_tick_texts_color="@color/black"
+           app:isb_thumb_color="@color/primary"
+           app:isb_thumb_size="20dp"
+           app:isb_show_indicator="rounded_rectangle"
+           app:isb_indicator_color="@color/primary"
+           app:isb_indicator_text_size="18sp"
+           app:isb_track_background_color="@color/grey"
+           app:isb_track_background_size="5dp"
+           app:isb_track_progress_color="@color/primary"
+           app:isb_track_progress_size="4dp"
+           app:isb_only_thumb_draggable="false"/>
+       <TextView
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:text="Rating Minimal"
+           android:layout_marginTop="10sp"
+           android:fontFamily="@font/inter_medium"
+           android:textColor="@color/black"
+           android:textSize="19sp"/>
+
+       <RatingBar
+           android:id="@+id/ratingBar"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_marginTop="10sp"
+           android:isIndicator="false"
+           android:numStars="5"
+           android:progressBackgroundTint="#BDBCBC"
+           android:progressTint="#FB9C10"/>
+   </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Reset"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/black"
+            android:textAllCaps="false"
+            android:layout_margin="10dp"
+            android:paddingStart="60dp"
+            android:paddingEnd="60dp"
+            android:layout_weight="1"
+            android:background="@drawable/bt_cornerblue"/>
+        <Button
+            android:id="@+id/btnApply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apply"
+            android:layout_marginStart="20dp"
+            android:layout_margin="10dp"
+            android:paddingStart="60dp"
+            android:layout_weight="1"
+            android:paddingEnd="60dp"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_rounded_blue"/>
+
+    </LinearLayout>
+
+</LinearLayout>
+

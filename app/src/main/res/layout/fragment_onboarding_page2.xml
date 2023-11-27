@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/primary"
+    tools:context=".ui.onboarding.fragment.Onboardingpage2">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10sp">
+        <TextView
+            android:id="@+id/menjelajahi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Wisata terdekat yang mengagumkan"
+            android:textColor="@color/white"
+            android:fontFamily="@font/inter_bold"
+            android:textSize="24sp"
+            android:gravity="center_horizontal|top"
+            />
+        <TextView
+            android:id="@+id/jelajahi_te"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Kami merekomendasikan destinasi wisata terdekat yang pasti akan membuat Anda terpukau."
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:fontFamily="@font/inter_semibold"
+            android:layout_marginTop="16sp"
+            android:lineSpacingExtra="4sp"
+            android:translationY="-2.03sp"
+            android:gravity="center_horizontal|top"
+            android:alpha="0.6"/>
+    </LinearLayout>
+
+</FrameLayout>

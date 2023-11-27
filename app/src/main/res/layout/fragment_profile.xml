@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dashboard.profile.ProfileFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/textViewProfile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:fontFamily="@font/inter_bold"
+            android:text="Profile"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="30sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgUserProfile"
+            android:layout_width="150sp"
+            android:layout_height="150sp"
+            android:layout_marginTop="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_user"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewProfile" />
+
+        <TextView
+            android:id="@+id/userNametxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:textAlignment="center"
+            android:textColor="@color/textBlack"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imgUserProfile" />
+        <TextView
+            android:id="@+id/emailUsertxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_medium"
+            android:textAlignment="center"
+            android:textColor="@color/grey"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userNametxt" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginEnd="25dp"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/emailUsertxt">
+
+            <LinearLayout
+                android:id="@+id/detailProfile"
+                android:layout_width="match_parent"
+                android:layout_height="55sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/img1"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/ic_your_profile" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:layout_toEndOf="@+id/img1"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/black"
+                    android:text="Profile Anda" />
+
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:src="@drawable/ic_arrow" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/updatePassword"
+                android:layout_width="match_parent"
+                android:layout_height="55sp"
+                android:layout_marginTop="15sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/img2"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/ic_update_password" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:layout_toEndOf="@+id/img2"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/black"
+                    android:text="Perbarui Password" />
+
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_arrow" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/historyPerjalanan"
+                android:layout_width="match_parent"
+                android:layout_height="55sp"
+                android:layout_marginTop="15sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/img3"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/ic_car" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:layout_toEndOf="@+id/img3"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/black"
+                    android:text="Perjalanan Anda" />
+
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_arrow" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/wishlist"
+                android:layout_width="match_parent"
+                android:layout_height="55sp"
+                android:layout_marginTop="15sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/img5"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/ic_wishlist" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:layout_toEndOf="@+id/img3"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="@color/black"
+                    android:text="Wishlist Anda" />
+
+                <ImageView
+                    android:layout_width="40sp"
+                    android:layout_height="40sp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_arrow" />
+            </LinearLayout>
+            <LinearLayout
+                android:id="@+id/logOut"
+                android:layout_width="match_parent"
+                android:layout_height="55sp"
+                android:layout_marginTop="15sp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/img4"
+                    android:layout_width="30sp"
+                    android:layout_height="30sp"
+                    android:src="@drawable/ic_logout" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:textSize="20sp"
+                    android:layout_toEndOf="@+id/img4"
+                    android:fontFamily="@font/inter_medium"
+                    android:textColor="#FF0000"
+                    android:text="Keluar" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+</FrameLayout>

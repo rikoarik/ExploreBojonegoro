@@ -1,0 +1,12 @@
+<!-- custom_ratingbar_background.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <scale android:scaleWidth="100%">
+            <selector>
+                <item android:state_checked="true">
+                    <color android:color="#FFA726" /> <!-- Background color when not rated -->
+                </item>
+            </selector>
+        </scale>
+    </item>
+</layer-list>
