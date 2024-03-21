@@ -306,8 +306,6 @@ class RouteNavigateActivity : AppCompatActivity() {
             if (userId != null && namaWisata != null && type != null) {
                 saveDestinationInfoToFirebase(userId, namaWisata, type)
             }
-
-            return@RouteProgressObserver
         }
     }
 
