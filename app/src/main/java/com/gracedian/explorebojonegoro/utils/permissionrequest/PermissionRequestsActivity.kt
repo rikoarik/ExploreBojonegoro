@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.app.ActivityCompat
@@ -16,11 +17,22 @@ class PermissionRequestsActivity : AppCompatActivity() {
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1
     private lateinit var btAccessLoc: AppCompatButton
+    private lateinit var btNantiSaja: TextView
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_permission_requests)
         btAccessLoc = findViewById(R.id.btAccessLoc)
+        btNantiSaja = findViewById(R.id.btNantiSaja)
+
+        btNantiSaja.setOnClickListener {
+            val intent = Intent(this, WelcomeActivity::class.java)
+            SharedPrefManager.setFirstInstall(this, false)
+            startActivity(intent)
+            finish()
+        }
+
         btAccessLoc.setOnClickListener {
             requestLocationPermission()
         }

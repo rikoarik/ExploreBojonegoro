@@ -201,7 +201,7 @@
                         android:fontFamily="@font/inter_bold"
                         android:text="Popular"
                         android:textColor="@color/textBlack"
-                        android:textSize="25sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:id="@+id/btAllPopular"
@@ -247,7 +247,7 @@
                         android:fontFamily="@font/inter_bold"
                         android:text="Wisata Terdekat"
                         android:textColor="@color/textBlack"
-                        android:textSize="25sp" />
+                        android:textSize="20sp" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -261,13 +261,14 @@
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcWisataTerdekat"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="0dp"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
                     tools:itemCount="10"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
+
                     app:layout_constraintTop_toBottomOf="@+id/linearLayout5"
                     tools:listitem="@layout/wisata_terdekat_items" />
             </androidx.constraintlayout.widget.ConstraintLayout>

@@ -44,7 +44,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     private val searchItemsList =  mutableListOf<SearchItem>()
     private val searchAdapter = SearchAdapter(searchItemsList, this)
 
-    private val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("datawisata")
+    private val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("objekwisata")
 
     private var appliedCategory: String = ""
     private var appliedRating: Float = 0.0f
@@ -133,12 +133,12 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                 if (dataSnapshot.exists()) {
                     searchItemsList.clear()
                     for (childSnapshot in dataSnapshot.children) {
-                        val imageUrl = "https://mmc.tirto.id/image/otf/880x495/2019/10/29/objek-wisata-kayangan-api-dinbudpar.bojonegorokab_1_ratio-16x9.jpg"
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
                         val title = childSnapshot.child("wisata").getValue(String::class.java) ?: ""
                         val location = childSnapshot.child("alamat").getValue(String::class.java) ?: ""
                         val ratingString = childSnapshot.child("rating").getValue(Float::class.java)
-                        val latString = childSnapshot.child("lat").getValue(String::class.java)
-                        val longString = childSnapshot.child("long").getValue(String::class.java)
+                        val latString = childSnapshot.child("latitude").getValue(String::class.java)
+                        val longString = childSnapshot.child("longitude").getValue(String::class.java)
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
 
@@ -150,7 +150,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         val jarak = calculateVincentyDistance(latitude, longitude, lat, long) / 1000
                         val intValue = jarak.toInt()
 
-                        val category = childSnapshot.child("category").getValue(String::class.java) ?: ""
+                        val category = childSnapshot.child("kategori").getValue(String::class.java) ?: ""
 
                         val searchItem = SearchItem(
                             imageUrl = imageUrl,

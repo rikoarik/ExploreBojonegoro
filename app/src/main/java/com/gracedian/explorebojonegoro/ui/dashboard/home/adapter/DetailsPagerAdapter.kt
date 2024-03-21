@@ -9,19 +9,19 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.Penginap
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.RestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.TentangFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.UlasanFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.fragment.FragmentMytrips
-import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.fragment.FragmentWishlist
 
 class DetailsPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
     private var data: Bundle? = null
-
     private var fragmentList: List<Fragment> = emptyList()
 
     fun setFragmentList(list: List<Fragment>) {
         fragmentList = list
     }
 
+    fun setData(data: Bundle) {
+        this.data = data
+    }
 
     override fun createFragment(position: Int): Fragment {
         return when (position) {
@@ -58,4 +58,3 @@ class DetailsPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAda
         return 5
     }
 }
-

@@ -70,6 +70,8 @@ class MyProfileActivity : AppCompatActivity() {
         editButton = findViewById(R.id.buttonEditProfile)
         loadingBar = findViewById(R.id.loadingBar)
 
+        inputEmail.isEnabled = false
+
         setFieldsEditable(false)
         btCancel.visibility = View.GONE
         changeImgProfile.visibility = View.GONE

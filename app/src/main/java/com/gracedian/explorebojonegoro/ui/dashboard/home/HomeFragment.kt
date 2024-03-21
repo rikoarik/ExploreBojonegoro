@@ -298,9 +298,8 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
             .into(imgUserProfile)
     }
     private fun getDataWisataTerdekat() {
-        val db = FirebaseDatabase.getInstance().getReference("datawisata")
+        val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         db.addValueEventListener(object : ValueEventListener {
-
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     wisataTerdekatList.clear()
@@ -308,12 +307,12 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                     for (childSnapshot in dataSnapshot.children) {
                         val wisata = childSnapshot.child("wisata").getValue(String::class.java)
                         val alamat = childSnapshot.child("alamat").getValue(String::class.java)
-                        val latString = childSnapshot.child("lat").getValue(String::class.java)
-                        val longString = childSnapshot.child("long").getValue(String::class.java)
+                        val latString = childSnapshot.child("latitude").getValue(String::class.java)
+                        val longString = childSnapshot.child("longitude").getValue(String::class.java)
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
 
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
-
 
                         // Hitung jarak antara lokasi saat ini dan lokasi wisata
                         val jarak = calculateVincentyDistance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, lat, long) / 1000
@@ -321,7 +320,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                         val intValue = jarak.toInt()
 
                         val wisataTerdekatItem = WisataTerdekatItem(
-                            imageUrl = "https://mmc.tirto.id/image/otf/880x495/2019/10/29/objek-wisata-kayangan-api-dinbudpar.bojonegorokab_1_ratio-16x9.jpg",
+                            imageUrl = imageUrl,
                             wisata = wisata,
                             rating = 0.toFloat(),
                             alamat = alamat,
@@ -331,7 +330,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                         )
                         wisataTerdekatList.add(wisataTerdekatItem)
                         val wisataPopularItem = PopularItem(
-                            imageUrl = "https://mmc.tirto.id/image/otf/880x495/2019/10/29/objek-wisata-kayangan-api-dinbudpar.bojonegorokab_1_ratio-16x9.jpg",
+                            imageUrl = imageUrl,
                             namaWisata = wisata,
                             lokasiWisata = alamat,
                             rating = 3.4

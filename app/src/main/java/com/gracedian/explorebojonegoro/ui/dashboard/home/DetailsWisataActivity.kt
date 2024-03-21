@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.database.DataSnapshot
@@ -20,7 +21,6 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.Penginap
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.RestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.TentangFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.UlasanFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.adapter.MyTripsPagerAdapter
 
 class DetailsWisataActivity : AppCompatActivity() {
 
@@ -72,32 +72,46 @@ class DetailsWisataActivity : AppCompatActivity() {
     }
     private fun getData() {
         val receivedIntent = intent
-        val nameWisata1 = receivedIntent.getStringExtra("wisata")
-        val db = FirebaseDatabase.getInstance().getReference("datawisata")
-        val query =  db.orderByChild("wisata").equalTo(nameWisata1)
+        val nameWisata = receivedIntent.getStringExtra("wisata")
+        val db = FirebaseDatabase.getInstance().getReference("objekwisata")
+        val query =  db.orderByChild("wisata").equalTo(nameWisata)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (childSnapshot in dataSnapshot.children) {
                         val wisata = childSnapshot.child("wisata").getValue(String::class.java)
                         val alamat = childSnapshot.child("alamat").getValue(String::class.java)
-                        val latString = childSnapshot.child("lat").getValue(String::class.java)
-                        val longString = childSnapshot.child("long").getValue(String::class.java)
+                        val latString = childSnapshot.child("latitude").getValue(String::class.java)
+                        val longString = childSnapshot.child("longitude").getValue(String::class.java)
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+                        val kategori = childSnapshot.child("kategori").getValue(String::class.java)
 
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
 
                         namaWisata.text = wisata
                         locWisata.text = alamat
-                        viewPager.adapter = adapter
-                        val tentangFragment = TentangFragment()
-                        val bundle = Bundle()
-                        bundle.putString("namaWisata", namaWisata.text.toString())
-                        bundle.putDouble("lat", lat)
-                        bundle.putDouble("long", long)
-                        tentangFragment.arguments = bundle
+                        categorytxt.text = kategori
+                        Glide.with(this@DetailsWisataActivity)
+                            .load(imageUrl)
+                            .into(imgWisata)
 
-                        val fragmentList = mutableListOf(tentangFragment, GaleriFragment(), PenginapanFragment(), RestoranFragment(), UlasanFragment())
+                        // Mengatur bundle untuk dikirim ke adapter
+                        val bundle = Bundle().apply {
+                            putString("namaWisata", wisata)
+                            putDouble("latitude", lat)
+                            putDouble("longitude", long)
+                        }
+                        adapter.setData(bundle)
+
+                        // Mengatur fragment-list untuk dikirim ke adapter
+                        val fragmentList = mutableListOf(
+                            TentangFragment(),
+                            GaleriFragment(),
+                            PenginapanFragment(),
+                            RestoranFragment(),
+                            UlasanFragment()
+                        )
                         adapter.setFragmentList(fragmentList)
                     }
                 }
