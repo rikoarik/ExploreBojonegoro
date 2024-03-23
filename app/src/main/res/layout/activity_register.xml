@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <ImageView
-            android:id="@+id/imageView6"
+            android:id="@+id/btBack"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_margin="20sp"
@@ -37,7 +37,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:background="@drawable/bg_edittext"
             android:elevation="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -47,10 +46,10 @@
                 android:id="@+id/inoutNama"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Nama"
                 android:inputType="textPersonName"
-                android:padding="10sp"
+
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -60,9 +59,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:background="@drawable/bg_edittext"
             android:elevation="10sp"
-            android:enabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutName">
@@ -71,10 +68,9 @@
                 android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Email"
                 android:inputType="textEmailAddress"
-                android:padding="10sp"
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -84,7 +80,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:background="@drawable/bg_edittext"
+
             android:elevation="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -95,10 +91,10 @@
                 android:id="@+id/inputPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Kata Sandi"
                 android:inputType="textPassword"
-                android:padding="10sp"
+
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -108,7 +104,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
-            android:background="@drawable/bg_edittext"
+
             android:elevation="10sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,10 +115,10 @@
                 android:id="@+id/inputConfirmPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Konfirmasi Kata Sandi"
                 android:inputType="textPassword"
-                android:padding="10sp"
+
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>

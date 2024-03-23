@@ -175,7 +175,7 @@
             android:layout_margin="10dp"
             android:background="@drawable/btn_rounded_blue"
             android:src="@drawable/ic_favorite_white"/>
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btNavigasi"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -183,6 +183,7 @@
             android:text="Mulai Navigasi"
             android:fontFamily="@font/inter_bold"
             android:textAllCaps="false"
+            android:elevation="10dp"
             android:textSize="18dp"
             android:textColor="@color/white"
             android:background="@drawable/btn_rounded_blue"/>

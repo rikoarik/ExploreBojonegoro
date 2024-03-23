@@ -62,7 +62,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            android:background="@drawable/bg_edittext"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/changeImg">
@@ -71,11 +70,11 @@
                 android:id="@+id/inputNama"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Nama"
                 android:inputType="textPersonName"
                 android:textColor="@color/black"
-                android:padding="10sp"
+              
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -86,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            android:background="@drawable/bg_edittext"
+            
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutName">
@@ -95,11 +94,11 @@
                 android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Email"
                 android:textColor="@color/black"
                 android:inputType="textEmailAddress"
-                android:padding="10sp"
+              
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -109,7 +108,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            android:background="@drawable/bg_edittext"
+            
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutEmail">
@@ -118,11 +117,10 @@
                 android:id="@+id/inputTlp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="No. tlp"
                 android:textColor="@color/black"
                 android:inputType="phone|number"
-                android:padding="10sp"
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -133,8 +131,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-
-            android:background="@drawable/bg_edittext"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutPassword">
@@ -142,11 +138,12 @@
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/autoCompleteGender"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:layout_height="50dp"
+                android:fontFamily="@font/inter"
                 android:hint="Jenis Kelamin"
                 android:inputType="text"
-                android:padding="10sp"
+                android:editable="false"
+                android:paddingStart="15dp"
                 android:textColor="@color/black"
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
@@ -163,6 +160,7 @@
             android:fontFamily="@font/inter_bold"
             android:text="Edit Profile"
             android:textAllCaps="false"
+            android:textSize="18sp"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

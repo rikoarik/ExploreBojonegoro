@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.auth.RegisterActivity
@@ -16,6 +17,7 @@ class WelcomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_welcome)
         SharedPrefManager.isFirstInstall(this)
 

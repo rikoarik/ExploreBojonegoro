@@ -8,12 +8,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -55,7 +57,6 @@ class MyProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_my_profile)
-
         database = FirebaseDatabase.getInstance()
         storageReference = FirebaseStorage.getInstance().reference
 
@@ -111,9 +112,24 @@ class MyProfileActivity : AppCompatActivity() {
             selectImage()
         }
 
-        val genderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, genderOptions)
+
+        val genderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, genderOptions)
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         autoCompleteGender.setAdapter(genderAdapter)
+
+        autoCompleteGender.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedItem = genderOptions[position]
+                autoCompleteGender.setSelection(position)
+
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Handle the case where nothing is selected (optional)
+            }
+        }
+
+
         getUserData()
     }
 

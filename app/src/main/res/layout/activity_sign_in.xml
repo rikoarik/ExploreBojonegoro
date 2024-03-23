@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            android:background="@drawable/bg_edittext"
+            android:hint="Email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView4">
@@ -47,11 +47,8 @@
                 android:id="@+id/inputEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
-                android:hint="Email"
+                android:fontFamily="@font/inter"
                 android:inputType="textEmailAddress"
-                android:padding="10sp"
-                android:textColorHint="@color/hint"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -61,7 +58,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            android:background="@drawable/bg_edittext"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:passwordToggleEnabled="true"
@@ -71,10 +67,9 @@
                 android:id="@+id/inputPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/inter_semibold"
+                android:fontFamily="@font/inter"
                 android:hint="Password"
                 android:inputType="textPassword"
-                android:padding="10sp"
                 android:textColorHint="@color/hint"
                 android:textSize="14sp" />
         </com.google.android.material.textfield.TextInputLayout>

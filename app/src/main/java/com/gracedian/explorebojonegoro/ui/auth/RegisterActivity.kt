@@ -32,6 +32,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var inputConfirmPasswordLayout: TextInputLayout
     private lateinit var buttonRegister: AppCompatButton
     private lateinit var btLogin: TextView
+    private lateinit var btBack: ImageView
     private lateinit var loadingBar: ProgressBar
 
     private lateinit var auth: FirebaseAuth
@@ -56,10 +57,14 @@ class RegisterActivity : AppCompatActivity() {
         buttonRegister = findViewById(R.id.buttonRegister)
         btLogin = findViewById(R.id.btLogin)
         loadingBar = findViewById(R.id.loadingBar)
+        btBack = findViewById(R.id.btBack)
 
         btLogin.setOnClickListener {
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
+            finish()
+        }
+        btBack.setOnClickListener {
             finish()
         }
 

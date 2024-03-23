@@ -10,6 +10,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2
@@ -32,6 +33,7 @@ class OnboardingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.activity_onboarding)
 
         imgIlustrasi = findViewById(R.id.ilustrasi)
