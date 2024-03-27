@@ -9,6 +9,7 @@ data class WisataTerdekatItem(
     val alamat: String?,
     var jarak: Int?,
     val lat: Double?,
-    val long: Double?
+    val long: Double?,
+    var isFavorite: Boolean = false
 )
 

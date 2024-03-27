@@ -257,6 +257,7 @@ class MyProfileActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
+                loadingBar.visibility = View.GONE
                 Toast.makeText(this, "Gagal mengunggah gambar", Toast.LENGTH_SHORT).show()
             }
     }
@@ -273,12 +274,16 @@ class MyProfileActivity : AppCompatActivity() {
                         userData.profileImageUrl = downloadUrl
                         databaseReference.setValue(userData)
                             .addOnSuccessListener {
-                                Toast.makeText(this@MyProfileActivity, "Data Profile dan gambar berhasil diperbarui", Toast.LENGTH_SHORT).show()
                                 changeImgProfile.visibility = View.GONE
                                 setFieldsEditable(false)
+                                btCancel.visibility = View.GONE
                                 editButton.text = "Edit Profile"
+                                loadingBar.visibility = View.GONE
+                                Toast.makeText(this@MyProfileActivity, "Data Profile dan gambar berhasil diperbarui", Toast.LENGTH_SHORT).show()
+
                             }
                             .addOnFailureListener { exception ->
+                                loadingBar.visibility = View.GONE
                                 Toast.makeText(this@MyProfileActivity, "Gagal mengupdate data profil", Toast.LENGTH_SHORT).show()
                             }
                     }
@@ -286,6 +291,7 @@ class MyProfileActivity : AppCompatActivity() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                loadingBar.visibility = View.GONE
                 Toast.makeText(this@MyProfileActivity, "Gagal mengupdate data profil", Toast.LENGTH_SHORT).show()
             }
         })

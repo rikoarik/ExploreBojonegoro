@@ -6,4 +6,5 @@ data class SearchItem (
     val rating: Double? = 0.0,
     val alamat: String?,
     var jarak: Int?,
+    var isFavorite: Boolean = false
 )

@@ -1,5 +1,6 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,8 +12,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -130,6 +133,10 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     private fun getData() {
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val previousFavorites = mutableMapOf<String, Boolean>() // Store previous favorite status
+                for (item in searchItemsList) {
+                    previousFavorites[item.wisata ?: ""] = item.isFavorite
+                }
                 if (dataSnapshot.exists()) {
                     searchItemsList.clear()
                     for (childSnapshot in dataSnapshot.children) {
@@ -164,6 +171,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         }
                     }
                     searchAdapter.notifyDataSetChanged()
+                    getFavoriteItems()
                     resultTextView.text = "${searchItemsList.size} hasil ditemukan"
 
                 }
@@ -174,7 +182,6 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
             }
         })
     }
-
     private fun filterSearchResults(query: String) {
         val filteredItems = searchItemsList.filter { searchItem ->
             val isRatingMatch = isRatingMatch(searchItem)
@@ -291,6 +298,76 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     }
 
     override fun onFavoriteClick(position: Int) {
-        TODO("Not yet implemented")
+        val searchItem = searchItemsList[position]
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (userId != null) {
+            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
+
+            val newFavoriteStatus = !searchItem.isFavorite
+
+            if (newFavoriteStatus) {
+                searchItem.wisata?.let {
+                    favoritesRef.child(it).setValue(true)
+                        .addOnSuccessListener {
+                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_true)
+                            showToast("Item added to favorites")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to add item to favorites: ${e.message}")
+                        }
+                }
+            } else {
+                searchItem.wisata?.let {
+                    favoritesRef.child(it).setValue(false)
+                        .addOnSuccessListener {
+                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_false)
+                            showToast("Item removed from favorites")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to remove item from favorites: ${e.message}")
+                        }
+                }
+            }
+        }
+    }
+
+    private fun getFavoriteItems() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let { uid ->
+            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(uid)
+            favoritesRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (childSnapshot in snapshot.children) {
+                        val itemId = childSnapshot.key
+                        val isFavorite = childSnapshot.getValue(Boolean::class.java)
+
+                        for (item in searchItemsList) {
+                            if (item.wisata == itemId) {
+                                item.isFavorite = isFavorite ?: false
+                                val position = searchItemsList.indexOf(item)
+                                val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+
+                                if (isFavorite == true){
+                                    imageView?.setImageResource(R.drawable.ic_favorite_true)
+                                } else {
+                                    imageView?.setImageResource(R.drawable.ic_favorite_false)
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("getFavoriteItems", "Error: ${error.message}")
+                }
+            })
+        }
+    }
+    fun Context.showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

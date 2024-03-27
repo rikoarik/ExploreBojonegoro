@@ -98,7 +98,7 @@
             android:id="@+id/btFavorite"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:src="@drawable/ic_favorite_line"/>
+            android:src="@drawable/ic_favorite_false"/>
 
     </LinearLayout>
 </LinearLayout>

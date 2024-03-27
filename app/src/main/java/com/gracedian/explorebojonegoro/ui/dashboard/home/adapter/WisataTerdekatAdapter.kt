@@ -50,7 +50,7 @@ class WisataTerdekatAdapter(
         holder.locWisata.text = currentItem.alamat
         holder.txtjarak.text = "${currentItem.jarak} Km"
 
-        // Set an OnClickListener for the btFavorite button
+
         holder.btFavorite.setOnClickListener {
             itemClickListener.onFavoriteClick(position)
         }
@@ -60,4 +60,7 @@ class WisataTerdekatAdapter(
     }
 
     override fun getItemCount() = min(wisataTerdekatList.size, 5)
+
+
+
 }

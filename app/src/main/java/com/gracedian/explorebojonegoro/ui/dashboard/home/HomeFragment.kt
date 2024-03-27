@@ -136,6 +136,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
         getUser()
         checkPermission()
         getDataWisataTerdekat()
+        getFavoriteItems()
     }
 
     private fun refreshData() {
@@ -301,6 +302,10 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         db.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val previousFavorites = mutableMapOf<String, Boolean>() // Store previous favorite status
+                for (item in wisataTerdekatList) {
+                    previousFavorites[item.wisata ?: ""] = item.isFavorite
+                }
                 if (dataSnapshot.exists()) {
                     wisataTerdekatList.clear()
                     wisataPopularList.clear()
@@ -345,7 +350,9 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                     rcWisataTerdekat.adapter = wisataTerdekatAdapter
                     wisataTerdekatAdapter.notifyDataSetChanged()
                 }
+
                 loadingProgressBar.visibility = View.GONE
+                getFavoriteItems()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -428,14 +435,87 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
 
 
     override fun onFavoriteClick(position: Int) {
-        TODO("Not yet implemented")
+        val favoriteItem = wisataTerdekatList[position]
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (userId != null) {
+            val favoritesRef = database.reference.child("favorites").child(userId)
+
+            val newFavoriteStatus = !favoriteItem.isFavorite
+
+            if (newFavoriteStatus) {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(true)
+                        .addOnSuccessListener {
+                            val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_true)
+                            showToast("Item added to favorites")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to add item to favorites: ${e.message}")
+                        }
+                }
+            } else {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(false)
+                        .addOnSuccessListener {
+                            val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_false)
+                            showToast("Item removed from favorites")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to remove item from favorites: ${e.message}")
+                        }
+                }
+            }
+        }
     }
+
+
 
     override fun onItemPopularClick(position: Int) {
         val popularItem = wisataPopularList[position]
         val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
         intent.putExtra("wisata", popularItem.namaWisata)
         startActivity(intent)
+    }
+
+    private fun getFavoriteItems() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let { uid ->
+            val favoritesRef = database.reference.child("favorites").child(uid)
+            favoritesRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                    for (childSnapshot in snapshot.children) {
+                        val itemId = childSnapshot.key
+                        val isFavorite = childSnapshot.getValue(Boolean::class.java)
+
+                        for (item in wisataTerdekatList) {
+                            if (item.wisata == itemId) {
+                                item.isFavorite = isFavorite ?: false
+                                val position = wisataTerdekatList.indexOf(item)
+                                val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+
+                                if (isFavorite == true){
+                                    imageView?.setImageResource(R.drawable.ic_favorite_true)
+                                } else {
+                                    imageView?.setImageResource(R.drawable.ic_favorite_false)
+                                }
+                                break
+                            }
+                        }
+                    }
+
+
+                }
+
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("getFavoriteItems", "Error: ${error.message}")
+                }
+            })
+        }
     }
 
 
