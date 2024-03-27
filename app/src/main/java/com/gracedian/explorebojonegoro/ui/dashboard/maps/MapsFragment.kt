@@ -73,8 +73,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
         return view
     }
 
-
-
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.uiSettings.isMapToolbarEnabled = true

@@ -1,12 +1,14 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.profile
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -25,6 +27,7 @@ import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.item.User
 import com.gracedian.explorebojonegoro.ui.dashboard.home.SearchActivity
 import com.gracedian.explorebojonegoro.ui.welcome.WelcomeActivity
+import de.hdodenhof.circleimageview.CircleImageView
 
 class ProfileFragment : Fragment() {
 
@@ -42,6 +45,7 @@ class ProfileFragment : Fragment() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
+    private var userImageURL: String? = ""
 
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
@@ -86,6 +90,11 @@ class ProfileFragment : Fragment() {
         logOut.setOnClickListener {
             showLogoutConfirmationDialog()
         }
+
+        imgUserProfile.setOnLongClickListener {
+            imagePreview()
+            true
+        }
         getUsers()
 
         return view
@@ -121,14 +130,13 @@ class ProfileFragment : Fragment() {
                     if (snapshot.exists()) {
                         val userData = snapshot.getValue(User::class.java)
                         val userName = userData?.name
-                        val userImageURL = userData?.profileImageUrl
+                        userImageURL = userData?.profileImageUrl
                         val userEmail = userData?.email
 
                         if (userName != null) {
                             userNametxt.text = userName
                             emailUser.text = userEmail
                             userImageURL?.let { loadImageProfile(it) }
-
 
                         }
                     }
@@ -148,5 +156,21 @@ class ProfileFragment : Fragment() {
             .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
             .into(imgUserProfile)
     }
+    private fun imagePreview() {
+        val dialog = Dialog(requireContext())
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.image_preview_dialog)
+
+        val previewImageView = dialog.findViewById<ImageView>(R.id.previewImageView)
+        userImageURL?.let { imageURL ->
+            Glide.with(requireContext())
+                .load(imageURL)
+                .placeholder(R.drawable.ic_user)
+                .into(previewImageView)
+        }
+
+        dialog.show()
+    }
+
 
 }

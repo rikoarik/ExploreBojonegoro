@@ -1,6 +1,7 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.profile
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.Window
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -119,7 +121,6 @@ class MyProfileActivity : AppCompatActivity() {
 
         autoCompleteGender.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedItem = genderOptions[position]
                 autoCompleteGender.setSelection(position)
 
             }
@@ -128,6 +129,7 @@ class MyProfileActivity : AppCompatActivity() {
                 // Handle the case where nothing is selected (optional)
             }
         }
+
 
 
         getUserData()

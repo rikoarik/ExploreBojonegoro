@@ -174,7 +174,7 @@
             android:cropToPadding="true"
             android:layout_margin="10dp"
             android:background="@drawable/btn_rounded_blue"
-            android:src="@drawable/ic_favorite_white"/>
+            android:src="@drawable/ic_favorite_false"/>
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btNavigasi"
             android:layout_width="match_parent"

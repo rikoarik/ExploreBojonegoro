@@ -77,7 +77,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
     private val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
     private var currentLocation: Location? = null
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
