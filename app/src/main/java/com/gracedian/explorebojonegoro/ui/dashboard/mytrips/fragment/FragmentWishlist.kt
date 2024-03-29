@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -43,11 +44,14 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
 
+
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_wishlist, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         recyclerView = view.findViewById(R.id.rcWishlist)
@@ -56,11 +60,17 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         recyclerView.adapter = adapter
 
         databaseReference = FirebaseDatabase.getInstance().getReference("favorites")
-        getLocation()
-        retrieveWishlistItems()
+
+
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getLocation()
+        retrieveWishlistItems()
+
+    }
     private fun getLocation(){
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
@@ -90,75 +100,28 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private fun retrieveWishlistItems() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         userId?.let {
-            databaseReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    wishlistItems.clear()
-                    for (data in snapshot.children) {
-                        val itemId = data.key.toString()
-
-                        getDataWisataTerdekat(itemId)
+            databaseReference.child(userId).orderByValue().equalTo(true)
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        wishlistItems.clear()
+                        for (data in snapshot.children) {
+                            val itemId = data.key.toString()
+                            getDataWisataTerdekat(itemId)
+                        }
                     }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Handle onCancelled event
-                }
-            })
+                    override fun onCancelled(error: DatabaseError) {
+                        // Handle onCancelled event
+                    }
+                })
         }
     }
 
-    override fun onItemTerdekatClick(position: Int) {
-        val terdekatItem = wishlistItems[position]
-        val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
-        intent.putExtra("wisata", terdekatItem.wisata)
-        startActivity(intent)
-    }
 
-    override fun onFavoriteClick(position: Int) {
-        val favoriteItem = wishlistItems[position]
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-        if (userId != null) {
-            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
-
-            val newFavoriteStatus = !favoriteItem.isFavorite
-
-            if (newFavoriteStatus) {
-                favoriteItem.wisata?.let {
-                    favoritesRef.child(it).setValue(true)
-                        .addOnSuccessListener {
-                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-                            imageView?.setImageResource(R.drawable.ic_favorite_true)
-                            showToast("Item added to favorites")
-                        }
-                        .addOnFailureListener { e ->
-                            showToast("Failed to add item to favorites: ${e.message}")
-                        }
-                }
-            } else {
-                favoriteItem.wisata?.let {
-                    favoritesRef.child(it).setValue(false)
-                        .addOnSuccessListener {
-                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-                            imageView?.setImageResource(R.drawable.ic_favorite_false)
-                            showToast("Item removed from favorites")
-                        }
-                        .addOnFailureListener { e ->
-                            showToast("Failed to remove item from favorites: ${e.message}")
-                        }
-                }
-            }
-        }
-
-    }
-    private fun showToast(message: String) {
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
     private fun getDataWisataTerdekat(wisata: String) {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         val query = db.orderByChild("wisata").equalTo(wisata)
-
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (childSnapshot in dataSnapshot.children) {
@@ -190,9 +153,13 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                     }
                     wishlistItems.sortBy { it.jarak }
                     recyclerView.adapter = adapter
-                    getFavoriteItems()
+
                     adapter.notifyDataSetChanged()
+
                 }
+                handler = Handler()
+                runnable = kotlinx.coroutines.Runnable { getFavoriteItems()}
+                handler.post(runnable)
 
 
             }
@@ -265,33 +232,79 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
 
         return s
     }
+    override fun onItemTerdekatClick(position: Int) {
+        val terdekatItem = wishlistItems[position]
+        val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
+        intent.putExtra("wisata", terdekatItem.wisata)
+        startActivity(intent)
+    }
+
+    override fun onFavoriteClick(position: Int) {
+        val favoriteItem = wishlistItems[position]
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        wishlistItems.clear()
+
+        if (userId != null) {
+            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
+
+            val newFavoriteStatus = !favoriteItem.isFavorite
+
+            if (newFavoriteStatus) {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(true)
+                        .addOnSuccessListener {
+                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_true)
+                            showToast("Wisata ditambahkan ke wishlist")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Gagal untuk menambahkan wisata ke wihslist: ${e.message}")
+                        }
+                }
+            } else {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(false)
+                        .addOnSuccessListener {
+                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_false)
+                            showToast("Item removed from favorites")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to remove item from favorites: ${e.message}")
+                        }
+                }
+
+            }
+
+        }
+
+    }
+
     private fun getFavoriteItems() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         userId?.let { uid ->
             val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(uid)
             favoritesRef.addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-
                     for (childSnapshot in snapshot.children) {
                         val itemId = childSnapshot.key
                         val isFavorite = childSnapshot.getValue(Boolean::class.java)
-
                         for (item in wishlistItems) {
                             if (item.wisata == itemId) {
                                 item.isFavorite = isFavorite ?: false
                                 val position = wishlistItems.indexOf(item)
                                 val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-
                                 if (isFavorite == true){
                                     imageView?.setImageResource(R.drawable.ic_favorite_true)
-                                } else {
-                                    imageView?.setImageResource(R.drawable.ic_favorite_false)
                                 }
+
                                 break
                             }
-                        }
-                    }
 
+                        }
+                        adapter.notifyDataSetChanged()
+                        handler.postDelayed(runnable, 1000)
+                    }
 
                 }
 
@@ -302,5 +315,16 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
             })
         }
     }
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(runnable)
+    }
+
+
+
 }
 

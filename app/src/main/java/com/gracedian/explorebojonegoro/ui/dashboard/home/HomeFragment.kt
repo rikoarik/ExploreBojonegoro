@@ -448,10 +448,10 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                         .addOnSuccessListener {
                             val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_true)
-                            showToast("Item added to favorites")
+                            showToast("Wisata ditambahkan ke wishlist")
                         }
                         .addOnFailureListener { e ->
-                            showToast("Failed to add item to favorites: ${e.message}")
+                            showToast("Gagal untuk menambahkan wisata ke wihslist: ${e.message}")
                         }
                 }
             } else {
@@ -460,10 +460,10 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                         .addOnSuccessListener {
                             val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_false)
-                            showToast("Item removed from favorites")
+                            showToast("Wisata dihapus dari wishlist")
                         }
                         .addOnFailureListener { e ->
-                            showToast("Failed to remove item from favorites: ${e.message}")
+                            showToast("Gagal untuk menghapus wisata dari wihslist: ${e.message}")
                         }
                 }
             }
