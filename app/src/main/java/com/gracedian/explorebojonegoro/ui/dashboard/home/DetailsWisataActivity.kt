@@ -38,7 +38,7 @@ class DetailsWisataActivity : AppCompatActivity() {
     private lateinit var btBack: ImageView
     private lateinit var btFavorite: ImageButton
     private lateinit var adapter: DetailsPagerAdapter
-    private var currentFavoriteStatus: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -109,6 +109,7 @@ class DetailsWisataActivity : AppCompatActivity() {
                         // Mengatur bundle untuk dikirim ke adapter
                         val bundle = Bundle().apply {
                             putString("namaWisata", wisata)
+                            putString("alamat", alamat)
                             putDouble("latitude", lat)
                             putDouble("longitude", long)
                         }
@@ -151,7 +152,7 @@ class DetailsWisataActivity : AppCompatActivity() {
                         favoritesRef.child(wisata).setValue(newFavoriteStatus)
                             .addOnSuccessListener {
                                 updateFavoriteUI(newFavoriteStatus)
-                                val successMessage = if (newFavoriteStatus) "Item added to favorites" else "Item removed from favorites"
+                                val successMessage = if (newFavoriteStatus) "Wisata ditambahkan ke wishlist" else "Wisata dihapus dari wishlist"
                                 showToast(this@DetailsWisataActivity, successMessage)
                             }
                             .addOnFailureListener { e ->
@@ -163,7 +164,7 @@ class DetailsWisataActivity : AppCompatActivity() {
                         favoritesRef.child(wisata).setValue(newFavoriteStatus)
                             .addOnSuccessListener {
                                 updateFavoriteUI(newFavoriteStatus)
-                                val successMessage = "Item added to favorites"
+                                val successMessage = "Wisata ditambahkan ke wishlistWisata ditambahkan ke wishlist"
                                 showToast(this@DetailsWisataActivity, successMessage)
                             }
                             .addOnFailureListener { e ->

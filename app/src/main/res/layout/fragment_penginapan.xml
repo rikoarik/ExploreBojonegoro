@@ -7,18 +7,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="5dp"
+
         android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Penginapan Terdekat"
+            android:layout_margin="5dp"
             android:textColor="@color/black"
             android:fontFamily="@font/inter_bold"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rcPenginapan"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent" />
     </LinearLayout>
 
 

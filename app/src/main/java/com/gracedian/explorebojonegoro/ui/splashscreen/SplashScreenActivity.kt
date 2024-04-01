@@ -2,13 +2,14 @@ package com.gracedian.explorebojonegoro.ui.splashscreen
 
 import SharedPrefManager
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.os.Handler
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.widget.ProgressBar
+import android.os.Bundle
+import android.os.Handler
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -20,12 +21,28 @@ import com.gracedian.explorebojonegoro.ui.welcome.WelcomeActivity
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {
 
-    private val SPLASH_DELAY: Long = 3000 // 3 seconds
+    private val SPLASH_DELAY: Long = 3000
+    private var isConnected: Boolean = false
+
+
+    private val networkChangeReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (isInternetAvailable()) {
+                isConnected = true
+                startNextActivity()
+            } else {
+                isConnected = false
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_splash_screen)
+
+        // Register the network change receiver
+        registerReceiver(networkChangeReceiver, IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION))
 
         if (isInternetAvailable()) {
             simulateProgress()
@@ -34,11 +51,16 @@ class SplashScreenActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(networkChangeReceiver)
+    }
+
     private fun simulateProgress() {
         Handler().postDelayed({
+            if (isConnected) return@postDelayed
             startNextActivity()
         }, SPLASH_DELAY)
-
     }
 
     private fun startNextActivity() {
@@ -47,15 +69,14 @@ class SplashScreenActivity : AppCompatActivity() {
 
         val intent = if (isFirstInstall) {
             Intent(this, OnboardingActivity::class.java)
-        }else if (isLoggedIn) {
+        } else if (isLoggedIn) {
             Intent(this, DashboardActivity::class.java)
-        } else{
+        } else {
             Intent(this, WelcomeActivity::class.java)
         }
 
         startActivity(intent)
         finish()
-
     }
 
     private fun isInternetAvailable(): Boolean {

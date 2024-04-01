@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
@@ -29,6 +30,9 @@ class GaleriFragment : Fragment() {
     private lateinit var galeriAdapter: GaleriAdapter
     private lateinit var countTxt: TextView
 
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,6 +50,7 @@ class GaleriFragment : Fragment() {
             intent.type = "image/*"
             startActivityForResult(intent, PICK_IMAGE)
         }
+        getImages()
 
         return view
     }
@@ -75,13 +80,40 @@ class GaleriFragment : Fragment() {
 
         fotoRef.putBytes(data)
             .addOnSuccessListener { taskSnapshot ->
-                val downloadUrl = taskSnapshot.metadata?.reference?.downloadUrl.toString()
-                galeriList.add(downloadUrl)
-                countTxt.text = "(${galeriList.size})"
-                galeriAdapter.notifyDataSetChanged()
+                Toast.makeText(requireContext(), "Berhasil mengunggah gambar", Toast.LENGTH_SHORT).show()
+                galeriList.clear()
+                getImages()
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(requireContext(), "Gagal mengunggah gambar: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
+
+    private fun getImages() {
+        val namaWisata = arguments?.getString("namaWisata")
+        val storage = FirebaseStorage.getInstance()
+        val storageRef: StorageReference = storage.reference
+
+        val galeriRef = storageRef.child("galeri/$namaWisata")
+
+        galeriRef.listAll()
+            .addOnSuccessListener { listResult ->
+                listResult.items.forEach { item ->
+                    item.downloadUrl.addOnSuccessListener { uri ->
+                        galeriList.add(uri.toString())
+                        countTxt.text = "(${galeriList.size})"
+                        galeriAdapter.notifyDataSetChanged()
+                    }.addOnFailureListener { exception ->
+
+                        Toast.makeText(requireContext(), "Gagal mendapatkan URL gambar: ${exception.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Toast.makeText(requireContext(), "Gagal mendapatkan daftar gambar: ${exception.message}", Toast.LENGTH_SHORT).show()
+            }
+
+    }
+
+
 }

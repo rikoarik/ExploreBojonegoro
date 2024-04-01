@@ -35,7 +35,7 @@ class FilterBottomSheetFragment :  SuperBottomSheetFragment() {
         btnApply = view.findViewById(R.id.btnApply)
         btnCancel = view.findViewById(R.id.btnCancel)
 
-        val categories = arrayOf("Pilih Kategori", "Wisata Alam", "Wisata Buatan", "Wisata Agro", "Wisata Edukasi", "Wisata Budaya dan Sejarah", "Wisata Minat Khusus", "Wisata Religi", "Geopark")
+        val categories = arrayOf("Pilih Kategori", "Wisata Alam", "Wisata Buatan", "Wisata Agro", "Wisata Edukasi", "Wisata Budaya dan Sejarah", "Wisata Religi")
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategory.adapter = adapter

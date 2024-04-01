@@ -33,7 +33,6 @@ class TentangFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_tentang, container, false)
         namaWisata = arguments?.getString("namaWisata").toString()
 
-        Log.d("nama wisata", namaWisata)
         descTxt = view.findViewById(R.id.descTxt)
         listLainLain = view.findViewById(R.id.listLainLain)
         getData()

@@ -24,14 +24,14 @@
             android:textColor="@color/black"
             android:text="Bambang"
             android:layout_weight="1"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:fontFamily="@font/inter_semibold"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/grey"
             android:text="1 bulan lalu"
-            android:textSize="18sp"
+            android:textSize="17sp"
             android:fontFamily="@font/inter"/>
 
     </LinearLayout>
@@ -41,7 +41,7 @@
         android:layout_marginTop="10dp"
         android:textColor="@color/grey"
         android:text="Wisata alam yang bagus untuk refresing"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:fontFamily="@font/inter"/>
     <LinearLayout
         android:layout_width="match_parent"
@@ -63,7 +63,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginBottom="5dp"
             android:text="5.0"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:fontFamily="@font/inter"/>
     </LinearLayout>
 
