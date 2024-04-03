@@ -11,11 +11,11 @@ import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Hotel
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Restoran
 
-class RestoranAdapter(private val restoranList: List<Restoran>) : RecyclerView.Adapter<RestoranAdapter.RestoranViewHolder>() {
+class RestoranAdapter(private val restoranList: List<Restoran>, private val onItemClick: (Restoran) -> Unit) : RecyclerView.Adapter<RestoranAdapter.RestoranViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RestoranViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.terdekat_items, parent, false)
-        return RestoranViewHolder(view)
+        return RestoranViewHolder(view, onItemClick)
     }
 
     override fun onBindViewHolder(holder: RestoranViewHolder, position: Int) {
@@ -27,17 +27,18 @@ class RestoranAdapter(private val restoranList: List<Restoran>) : RecyclerView.A
         return restoranList.size
     }
 
-    class RestoranViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class RestoranViewHolder(itemView: View, private val onItemClick: (Restoran) -> Unit) : RecyclerView.ViewHolder(itemView) {
         fun bind(restoran: Restoran) {
-
             itemView.findViewById<TextView>(R.id.namaPenginapan).text = restoran.nama
             itemView.findViewById<TextView>(R.id.locPenginapan).text = restoran.alamat
-
-
             Glide.with(itemView.context)
                 .load(restoran.imageUrl)
                 .into(itemView.findViewById(R.id.imgPenginapan))
             itemView.findViewById<TextView>(R.id.txtjarak).text = " ${restoran.jarak} Km"
+
+            itemView.setOnClickListener {
+                onItemClick(restoran)
+            }
         }
     }
 }

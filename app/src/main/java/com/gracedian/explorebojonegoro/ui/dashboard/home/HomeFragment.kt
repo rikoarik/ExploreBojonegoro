@@ -77,6 +77,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
     private val wisataPopularList = mutableListOf<PopularItem>()
     private val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
     private var currentLocation: Location? = null
+    private var averageRating = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -291,6 +292,8 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
+
     private fun loadImageProfile(imageURL: String) {
         Glide.with(requireContext())
             .load(imageURL)
@@ -327,7 +330,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                         val wisataTerdekatItem = WisataTerdekatItem(
                             imageUrl = imageUrl,
                             wisata = wisata,
-                            rating = 0.toFloat(),
+                            rating = averageRating,
                             alamat = alamat,
                             jarak = intValue,
                             lat = lat,
@@ -338,11 +341,14 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
                             imageUrl = imageUrl,
                             namaWisata = wisata,
                             lokasiWisata = alamat,
-                            rating = 3.4
+                            rating = averageRating
                         )
                         wisataPopularList.add(wisataPopularItem)
-
+                        if (wisata != null) {
+                            setRatingTextByWisataName(wisata)
+                        }
                     }
+
                     wisataTerdekatList.sortBy { it.jarak }
                     wisataPopularList.sortByDescending { it.rating }
                     rcWisataPopular.adapter = popularAdapter
@@ -455,6 +461,52 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, Popu
             })
         }
     }
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    totalReviews = max(totalReviews, 1)
+
+                    val averageRating = totalRating / totalReviews
+                    for (item in wisataTerdekatList) {
+                        if (item.wisata == wisata) {
+                            item.rating = averageRating
+                        }
+                    }
+
+                    wisataTerdekatAdapter.notifyDataSetChanged()
+                    for (item in wisataPopularList) {
+                        if (item.namaWisata == wisata) {
+                            item.rating = averageRating
+                            Log.e("ratingg", item.rating.toString())
+                        }
+                    }
+
+                    popularAdapter.notifyDataSetChanged()
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
+            }
+        })
+    }
+
 
 
 }

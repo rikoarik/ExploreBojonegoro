@@ -1,6 +1,7 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,14 @@ import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
 import com.andrefrsousa.superbottomsheet.SuperBottomSheetFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Ulasan
+import com.gracedian.explorebojonegoro.item.User
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.UlasanItems
 
 class AddUlasanFragment : SuperBottomSheetFragment() {
 
@@ -46,28 +51,71 @@ class AddUlasanFragment : SuperBottomSheetFragment() {
         val alamatWisata = arguments?.getString("alamat")
         namaWisata.text = namaWisataText
         locWisata.text = alamatWisata
+
         btnApply.setOnClickListener {
             val ulasan = editTextTextMultiLine.text.toString()
             val rating = ratingBar.rating.toDouble()
 
-            val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
-            val namaObjekWisata = namaWisata.text.toString()
-
             val databaseReference = FirebaseDatabase.getInstance().reference
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
 
-            currentUserUid?.let { uid ->
-                databaseReference.child("ulasan")
-                    .child(namaObjekWisata)
-                    .child(uid)
-                    .setValue(Ulasan(rating, ulasan))
-                    .addOnSuccessListener {
-                        Toast.makeText(requireContext(), "Ulasan Berhasil disimpan", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener {
-                        // Gagal menyimpan ulasan ke Firebase Database
-                    }
+            if (userId != null) {
+                val namaObjekWisata = namaWisata.text.toString()
+
+                val ulasanId = databaseReference.child("Ulasan").push().key ?: ""
+                val currentUserRef = databaseReference.child("Ulasan").child(namaObjekWisata).child(ulasanId)
+                val dateAdded = System.currentTimeMillis().toString()
+
+                userId.let { uid ->
+                    databaseReference
+                        .child("users")
+                        .child(uid)
+                        .addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    val userData = snapshot.getValue(User::class.java)
+                                    val userName = userData?.name
+                                    val userImageURL = userData?.profileImageUrl
+
+                                    currentUserRef.setValue(
+                                        UlasanItems(
+                                            userImageURL,
+                                            userName,
+                                            dateAdded,
+                                            ulasan,
+                                            rating
+                                        )
+                                    )
+                                        .addOnSuccessListener {
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Ulasan Berhasil disimpan",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                            dismiss()
+                                        }
+                                        .addOnFailureListener {
+                                            Log.e(
+                                                "AddUlasanFragment",
+                                                "Gagal menyimpan ulasan ke Firebase Database",
+                                                it
+                                            )
+                                        }
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                Log.e("error", error.message)
+                            }
+                        })
+                }
             }
         }
+
+
         return view
     }
+
+
+
 }

@@ -25,6 +25,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.Penginap
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.RestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.TentangFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.UlasanFragment
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.UlasanItems
 
 class DetailsWisataActivity : AppCompatActivity() {
 
@@ -98,7 +99,9 @@ class DetailsWisataActivity : AppCompatActivity() {
 
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
-
+                        if (wisata != null) {
+                            setRatingTextByWisataName(wisata)
+                        }
                         namaWisata.text = wisata
                         locWisata.text = alamat
                         categorytxt.text = kategori
@@ -106,7 +109,6 @@ class DetailsWisataActivity : AppCompatActivity() {
                             .load(imageUrl)
                             .into(imgWisata)
 
-                        // Mengatur bundle untuk dikirim ke adapter
                         val bundle = Bundle().apply {
                             putString("namaWisata", wisata)
                             putString("alamat", alamat)
@@ -115,15 +117,12 @@ class DetailsWisataActivity : AppCompatActivity() {
                         }
                         adapter.setData(bundle)
 
-                        // Mengatur fragment-list untuk dikirim ke adapter
                         val fragmentList = mutableListOf(
                             TentangFragment(),
                             GaleriFragment(),
                             PenginapanFragment(),
                             RestoranFragment(),
                             UlasanFragment()
-
-
                         )
                         getFavoriteItems()
                         adapter.setFragmentList(fragmentList)
@@ -210,10 +209,43 @@ class DetailsWisataActivity : AppCompatActivity() {
             })
         }
     }
+
     private fun updateFavoriteUI(isFavorite: Boolean) {
         val drawableResId = if (isFavorite) R.drawable.ic_favorite_true else R.drawable.ic_favorite_false
         btFavorite.setImageResource(drawableResId)
     }
+
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    val averageRating = if (totalReviews > 0) totalRating / totalReviews else 0.0
+                    val ratingText = String.format("$averageRating ($totalReviews Reviews)")
+                    reviewtxt.text = ratingText
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
+            }
+        })
+    }
+
+
 
     private fun showToast(context: Context, message: String) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show()

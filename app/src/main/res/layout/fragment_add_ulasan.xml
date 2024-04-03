@@ -67,6 +67,7 @@
         android:layout_marginTop="10sp"
         android:isIndicator="false"
         android:numStars="5"
+        style="@style/Widget.AppCompat.RatingBar.Indicator"
         android:progressBackgroundTint="#BDBCBC"
         android:progressTint="#FB9C10"/>
     <TextView

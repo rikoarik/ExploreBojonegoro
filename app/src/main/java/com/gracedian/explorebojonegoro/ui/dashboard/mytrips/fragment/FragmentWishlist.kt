@@ -31,6 +31,7 @@ import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -142,7 +143,7 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         val wisataTerdekatItem = WisataTerdekatItem(
                             imageUrl = imageUrl,
                             wisata = wisata,
-                            rating = 0.toFloat(),
+                            rating = 0.0,
                             alamat = alamat,
                             jarak = intValue,
                             lat = lat,
@@ -150,7 +151,9 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         )
                         wishlistItems.add(wisataTerdekatItem)
 
-
+                        if (wisata != null) {
+                            setRatingTextByWisataName(wisata)
+                        }
                     }
                     wishlistItems.sortBy { it.jarak }
                     recyclerView.adapter = adapter
@@ -253,6 +256,42 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                 }
             })
         }
+    }
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    totalReviews = max(totalReviews, 1)
+
+                    val averageRating = totalRating / totalReviews
+                    for (item in wishlistItems) {
+                        if (item.wisata == wisata) {
+                            item.rating = averageRating
+                        }
+                    }
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
+            }
+        })
     }
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()

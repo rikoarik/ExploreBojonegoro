@@ -1,5 +1,6 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -31,7 +32,11 @@ class RestoranFragment : Fragment() {
 
         val rcPenginapan = view.findViewById<RecyclerView>(R.id.rcRestoran)
         rcPenginapan.layoutManager = LinearLayoutManager(requireContext())
-        restoranAdapter = RestoranAdapter(restoranList)
+        restoranAdapter = RestoranAdapter(restoranList) { restoran ->
+            val intent = Intent(requireContext(), DetailsRestoranActivity::class.java)
+            intent.putExtra("nama_restoran", restoran.nama)
+            startActivity(intent)
+        }
         rcPenginapan.adapter = restoranAdapter
 
         fetchHotelData()

@@ -46,7 +46,7 @@ class WisataTerdekatAdapter(
             .into(holder.imgWisata)
 
         holder.namaWisata.text = currentItem.wisata
-        holder.ratingBar.rating = currentItem.rating!!
+        holder.ratingBar.rating = currentItem.rating!!.toFloat()
         holder.locWisata.text = currentItem.alamat
         holder.txtjarak.text = "${currentItem.jarak} Km"
 

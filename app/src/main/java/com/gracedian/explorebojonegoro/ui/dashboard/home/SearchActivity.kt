@@ -29,6 +29,7 @@ import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincenty
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -144,13 +145,10 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
                         val title = childSnapshot.child("wisata").getValue(String::class.java) ?: ""
                         val location = childSnapshot.child("alamat").getValue(String::class.java) ?: ""
-                        val ratingString = childSnapshot.child("rating").getValue(Float::class.java)
                         val latString = childSnapshot.child("latitude").getValue(String::class.java)
                         val longString = childSnapshot.child("longitude").getValue(String::class.java)
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
-
-                        val rating = ratingString ?: 0.0
 
                         val receivedIntent = intent
                         val latitude = receivedIntent.getDoubleExtra("lat", 0.0)
@@ -164,11 +162,14 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                             imageUrl = imageUrl,
                             wisata = title,
                             alamat = location,
-                            rating = 3.0,
+                            rating = 0.0,
                             jarak = intValue
                         )
                         if (isRatingMatch(searchItem) && isJarakMaxMatch(searchItem)) {
                             searchItemsList.add(searchItem)
+                        }
+                        if (title != null) {
+                            setRatingTextByWisataName(title)
                         }
                     }
                     searchAdapter.notifyDataSetChanged()
@@ -304,6 +305,46 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                 }
             })
         }
+    }
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    totalReviews = max(totalReviews, 1)
+
+                    val averageRating = totalRating / totalReviews
+                    for (item in searchItemsList) {
+                        if (item.wisata == wisata) {
+                            item.rating = averageRating
+                            // Memberi tahu adapter bahwa data telah berubah
+                            searchAdapter.notifyDataSetChanged()
+                            break
+                        }
+                    }
+
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
+            }
+        })
     }
     fun Context.showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

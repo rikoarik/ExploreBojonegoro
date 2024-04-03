@@ -34,6 +34,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.DetailsWisataActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import kotlin.math.max
 import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
@@ -151,14 +152,16 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                         val wisataTerdekatItem = WisataTerdekatItem(
                             imageUrl = imageUrl,
                             wisata = wisata,
-                            rating = 0.toFloat(),
+                            rating = 0.0,
                             alamat = alamat,
                             jarak = intValue,
                             lat = lat,
                             long = long,
                         )
                         wisataTerdekatList.add(wisataTerdekatItem)
-
+                        if (wisata != null) {
+                            setRatingTextByWisataName(wisata)
+                        }
                     }
                     wisataTerdekatList.sortBy { it.jarak }
                     rcWisataMaps.adapter = wisataTerdekatAdapter
@@ -249,6 +252,43 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                 }
             })
         }
+    }
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata).addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    totalReviews = max(totalReviews, 1)
+
+                    val averageRating = totalRating / totalReviews
+                    for (item in wisataTerdekatList) {
+                        if (item.wisata == wisata) {
+                            item.rating = averageRating
+                            wisataTerdekatAdapter.notifyDataSetChanged()
+                            break
+                        }
+                    }
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
+            }
+        })
     }
 
 

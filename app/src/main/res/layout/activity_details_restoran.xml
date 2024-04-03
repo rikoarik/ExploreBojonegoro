@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.dashboard.home.DetailsWisataActivity">
-
+    tools:context=".ui.dashboard.home.fragmentdetail.DetailsRestoranActivity">
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -30,7 +30,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/imgWisata"
+                android:id="@+id/imgRestoran"
                 android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:scaleType="centerCrop"
@@ -48,27 +48,13 @@
                 android:layout_marginEnd="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imgWisata">
+                app:layout_constraintTop_toBottomOf="@+id/imgRestoran">
 
-                <TextView
-                    android:id="@+id/categorytxt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="@dimen/default_nav_item_title_max_width"
-                    android:background="@drawable/bg_rounded_alpha"
-                    android:fontFamily="@font/inter_semibold"
-                    android:paddingStart="15dp"
-                    android:paddingEnd="15dp"
-                    android:text="Kategori"
-                    android:textColor="@color/primary"
-                    android:textSize="16dp" />
 
                 <TextView
                     android:id="@+id/reviewtxt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
                     android:drawableStart="@drawable/ic_star_filled"
                     android:drawablePadding="5dp"
                     android:fontFamily="@font/inter_semibold"
@@ -79,14 +65,14 @@
             </RelativeLayout>
 
             <TextView
-                android:id="@+id/namaWisata"
+                android:id="@+id/namaRestoran"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="20dp"
                 android:fontFamily="@font/inter_bold"
-                android:text="Wisata"
+                android:text="Restoran"
                 android:textColor="@color/black"
                 android:textSize="25dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +90,7 @@
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/namaWisata">
+                app:layout_constraintTop_toBottomOf="@+id/namaRestoran">
 
                 <ImageView
                     android:layout_width="30dp"
@@ -112,7 +98,7 @@
                     android:src="@drawable/ic_pin" />
 
                 <TextView
-                    android:id="@+id/locWisata"
+                    android:id="@+id/locRestoran"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_medium"
@@ -163,17 +149,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
-        <ImageButton
-            android:id="@+id/btFavorite"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="10dp"
-            android:elevation="10dp"
-            android:scaleType="fitCenter"
-            android:cropToPadding="true"
-            android:layout_margin="10dp"
-            android:background="@drawable/btn_rounded_blue"
-            android:src="@drawable/ic_favorite_false"/>
+        
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btNavigasi"
             android:layout_width="match_parent"
@@ -187,5 +163,4 @@
             android:textColor="@color/white"
             android:background="@drawable/btn_rounded_blue"/>
     </LinearLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

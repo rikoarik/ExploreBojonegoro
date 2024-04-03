@@ -19,6 +19,9 @@
         android:theme="@style/Theme.ExploreBojonegoro"
         tools:targetApi="tiramisu">
         <activity
+            android:name=".ui.dashboard.home.fragmentdetail.DetailsRestoranActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.dashboard.home.DetailsWisataActivity"
             android:exported="false" />
         <activity
