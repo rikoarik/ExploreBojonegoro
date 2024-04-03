@@ -74,7 +74,7 @@
             android:paddingStart="15sp"
             android:drawableEnd="@drawable/ic_star_filled"
             android:paddingEnd="10sp"
-            android:text="1 "
+            android:text="0 "
             android:gravity="center_vertical"
             android:textSize="16sp"
             android:fontFamily="@font/inter_semibold"

@@ -2,6 +2,7 @@ package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.HotelAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Hotel
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import kotlin.math.max
 
 class PenginapanFragment : Fragment() {
 
@@ -63,15 +65,55 @@ class PenginapanFragment : Fragment() {
                         imageUrl,
                         latitude,
                         longitude,
+                        rating = 0.0,
                         intValue
                     )
                     hotelList.add(hotelTerdekatItem)
+                    setRatingTextByHotelName(hotelName)
                 }
                 hotelAdapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 // Handle database error
+            }
+        })
+    }
+    private fun setRatingTextByHotelName(hotel: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("UlasanHotel").child(hotel).addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                var totalRating = 0.0
+                var totalReviews = 0
+                if (snapshot.exists()) {
+                    for (ulasanSnapshot in snapshot.children) {
+                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                        rating?.let {
+                            totalRating += it
+                            totalReviews++
+                        } ?: run {
+                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+                        }
+                    }
+
+                    totalReviews = max(totalReviews, 1)
+
+                    val averageRating = totalRating / totalReviews
+                    for (item in hotelList) {
+                        if (item.nama == hotel) {
+                            item.rating = averageRating
+                        }
+                    }
+
+                    hotelAdapter.notifyDataSetChanged()
+
+
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Database error: ${error.message}")
+                // Handle error
             }
         })
     }

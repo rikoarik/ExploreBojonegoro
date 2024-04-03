@@ -6,6 +6,7 @@ data class Hotel(
     val imageUrl: String? = null,
     val latitude: String? = null,
     val longitude: String? = null,
+    var rating: Double? = null,
     val jarak: Int = 0
 )
 
