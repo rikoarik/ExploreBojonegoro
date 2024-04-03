@@ -45,33 +45,40 @@ class PenginapanFragment : Fragment() {
     }
 
     private fun fetchHotelData() {
-        val wisataLat = arguments?.getDouble("latitude") ?: 0.0
-        val wisataLong = arguments?.getDouble("longitude") ?: 0.0
+        val hotelLat = arguments?.getDouble("latitude") ?: 0.0
+        val hotelLong = arguments?.getDouble("longitude") ?: 0.0
         val databaseReference = FirebaseDatabase.getInstance().reference.child("Hotel")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (snapshot in dataSnapshot.children) {
-                    val hotelName = snapshot.child("Hotel").getValue(String::class.java) ?: ""
-                    val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
-                    val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
-                    val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
-                    val longitude = snapshot.child("longitude").getValue(String::class.java) ?: ""
+                if (dataSnapshot.exists()){
+                    hotelList.clear()
+                    for (snapshot in dataSnapshot.children) {
+                        val hotelName = snapshot.child("Hotel").getValue(String::class.java) ?: ""
+                        val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
+                        val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
+                        val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
+                        val longitude = snapshot.child("longitude").getValue(String::class.java) ?: ""
 
-                    val jarak = calculateVincentyDistance(wisataLat, wisataLong, latitude.toDouble(), longitude.toDouble()) / 1000
-                    val intValue = jarak.toInt()
-                    val hotelTerdekatItem = Hotel(
-                        hotelName,
-                        alamat,
-                        imageUrl,
-                        latitude,
-                        longitude,
-                        rating = 0.0,
-                        intValue
-                    )
-                    hotelList.add(hotelTerdekatItem)
-                    setRatingTextByHotelName(hotelName)
+                        val jarak = calculateVincentyDistance(hotelLat, hotelLong, latitude.toDouble(), longitude.toDouble()) / 1000
+                        val intValue = jarak.toInt()
+                        val hotelTerdekatItem = Hotel(
+                            hotelName,
+                            alamat,
+                            imageUrl,
+                            latitude,
+                            longitude,
+                            rating = 0.0,
+                            intValue
+                        )
+                        hotelList.add(hotelTerdekatItem)
+                        if (hotelName != null){
+                            setRatingTextByHotelName(hotelName)
+                        }
+
+                    }
+                    hotelAdapter.notifyDataSetChanged()
                 }
-                hotelAdapter.notifyDataSetChanged()
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -102,11 +109,10 @@ class PenginapanFragment : Fragment() {
                     for (item in hotelList) {
                         if (item.nama == hotel) {
                             item.rating = averageRating
+                            hotelAdapter.notifyDataSetChanged()
+                            break
                         }
                     }
-
-                    hotelAdapter.notifyDataSetChanged()
-
 
                 }
             }

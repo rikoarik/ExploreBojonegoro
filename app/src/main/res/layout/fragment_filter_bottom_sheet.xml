@@ -111,6 +111,7 @@
            android:layout_marginTop="10sp"
            android:isIndicator="false"
            android:numStars="5"
+           android:stepSize="0.1"
            android:progressBackgroundTint="#BDBCBC"
            android:progressTint="#FB9C10"/>
    </LinearLayout>

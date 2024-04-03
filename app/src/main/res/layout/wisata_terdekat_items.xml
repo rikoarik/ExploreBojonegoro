@@ -50,7 +50,7 @@
                 android:isIndicator="true"
                 android:numStars="5"
                 android:progressDrawable="@drawable/custom_rating_bar"
-                android:stepSize="0.5" />
+                android:stepSize="0.1" />
 
 
             <LinearLayout

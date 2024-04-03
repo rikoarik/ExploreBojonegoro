@@ -52,28 +52,32 @@ class RestoranFragment : Fragment() {
         val databaseReference = FirebaseDatabase.getInstance().reference.child("Restoran")
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                for (snapshot in dataSnapshot.children) {
-                    val restoranName = snapshot.child("Restoran").getValue(String::class.java) ?: ""
-                    val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
-                    val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
-                    val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
-                    val longitude = snapshot.child("longitude").getValue(String::class.java) ?: ""
+                if (dataSnapshot.exists()){
+                    restoranList.clear()
+                    for (snapshot in dataSnapshot.children) {
+                        val restoranName = snapshot.child("Restoran").getValue(String::class.java) ?: ""
+                        val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
+                        val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
+                        val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
+                        val longitude = snapshot.child("longitude").getValue(String::class.java) ?: ""
 
-                    val jarak = calculateVincentyDistance(restoranLat, restoranLong, latitude.toDouble(), longitude.toDouble()) / 1000
-                    val intValue = jarak.toInt()
-                    val restoranTerdekatItem = Restoran(
-                        restoranName,
-                        alamat,
-                        imageUrl,
-                        latitude,
-                        longitude,
-                        rating = 0.0,
-                        intValue
-                    )
-                    restoranList.add(restoranTerdekatItem)
-                    setRatingTextByRestoranName(restoranName)
+                        val jarak = calculateVincentyDistance(restoranLat, restoranLong, latitude.toDouble(), longitude.toDouble()) / 1000
+                        val intValue = jarak.toInt()
+                        val restoranTerdekatItem = Restoran(
+                            restoranName,
+                            alamat,
+                            imageUrl,
+                            latitude,
+                            longitude,
+                            rating = 0.0,
+                            intValue
+                        )
+                        restoranList.add(restoranTerdekatItem)
+                        setRatingTextByRestoranName(restoranName)
+                    }
+                    restoranAdapter.notifyDataSetChanged()
                 }
-                restoranAdapter.notifyDataSetChanged()
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -104,10 +108,12 @@ class RestoranFragment : Fragment() {
                     for (item in restoranList) {
                         if (item.nama == restoran) {
                             item.rating = averageRating
+                            restoranAdapter.notifyDataSetChanged()
+                            break
                         }
                     }
 
-                    restoranAdapter.notifyDataSetChanged()
+
 
                 }
             }

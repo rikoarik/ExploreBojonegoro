@@ -4,6 +4,7 @@ package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -35,7 +36,7 @@ class RestoranAdapter(private val restoranList: List<Restoran>, private val onIt
                 .load(restoran.imageUrl)
                 .into(itemView.findViewById(R.id.imgPenginapan))
             itemView.findViewById<TextView>(R.id.txtjarak).text = " ${restoran.jarak} Km"
-
+            itemView.findViewById<RatingBar>(R.id.ratingBar).rating = restoran.rating!!.toFloat()
             itemView.setOnClickListener {
                 onItemClick(restoran)
             }

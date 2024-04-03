@@ -3,6 +3,7 @@ package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -30,13 +31,13 @@ class HotelAdapter(private val hotelList: List<Hotel>, private val onItemClick: 
 
             itemView.findViewById<TextView>(R.id.namaPenginapan).text = hotel.nama
             itemView.findViewById<TextView>(R.id.locPenginapan).text = hotel.alamat
-
+            var ratingBar = itemView.findViewById<RatingBar>(R.id.ratingBar)
+            ratingBar.rating = hotel.rating!!.toFloat()
 
             Glide.with(itemView.context)
                 .load(hotel.imageUrl)
                 .into(itemView.findViewById(R.id.imgPenginapan))
             itemView.findViewById<TextView>(R.id.txtjarak).text = " ${hotel.jarak} Km"
-
             itemView.setOnClickListener {
                 onItemClick(hotel)
             }
