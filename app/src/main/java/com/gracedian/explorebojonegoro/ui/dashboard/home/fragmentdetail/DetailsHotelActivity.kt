@@ -18,44 +18,43 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.DetailsPagerAdapter
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.RestoranDetailsPagerAdapter
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.GalleryRestoranFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.TentangRestoranFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.UlasanRestoranFragment
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.HotelDetailsPagerAdapter
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailshotel.GalleryHotelFragment
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailshotel.TentangHotelFragment
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailshotel.UlasanHotelFragment
 
-class DetailsRestoranActivity : AppCompatActivity() {
-
+class DetailsHotelActivity : AppCompatActivity() {
+    
     private lateinit var btBack: ImageView
-    private lateinit var imgRestoran: ImageView
+    private lateinit var imgHotel: ImageView
     private lateinit var reviewtxt: TextView
-    private lateinit var namaRestoran: TextView
-    private lateinit var locRestoran: TextView
+    private lateinit var namaHotel: TextView
+    private lateinit var locHotel: TextView
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var btNavigasi: AppCompatButton
-    private lateinit var adapter: RestoranDetailsPagerAdapter
-
+    private lateinit var adapter: HotelDetailsPagerAdapter
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_details_restoran)
+        setContentView(R.layout.activity_details_hotel)
 
         init()
-        fetchRestoranData()
+        fetchHotelData()
         btBack.setOnClickListener {
             finish()
         }
     }
     private fun init(){
         btBack = findViewById(R.id.btBack)
-        imgRestoran = findViewById(R.id.imgRestoran)
+        imgHotel = findViewById(R.id.imgHotel)
         reviewtxt = findViewById(R.id.reviewtxt)
-        namaRestoran = findViewById(R.id.namaRestoran)
-        locRestoran = findViewById(R.id.locRestoran)
+        namaHotel = findViewById(R.id.namaHotel)
+        locHotel = findViewById(R.id.locHotel)
         tabLayout = findViewById(R.id.tabLayout)
         viewPager = findViewById(R.id.viewPager)
         btNavigasi = findViewById(R.id.btNavigasi)
-        adapter = RestoranDetailsPagerAdapter(this)
+        adapter = HotelDetailsPagerAdapter(this)
         viewPager.adapter = adapter
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
@@ -66,14 +65,14 @@ class DetailsRestoranActivity : AppCompatActivity() {
             }
         }.attach()
     }
-    private fun fetchRestoranData() {
-        val restoran = intent.getStringExtra("nama_restoran").toString()
-        val databaseReference = FirebaseDatabase.getInstance().reference.child("Restoran").orderByChild(restoran)
+    private fun fetchHotelData() {
+        val Hotel = intent.getStringExtra("nama_hotel").toString()
+        val databaseReference = FirebaseDatabase.getInstance().reference.child("Hotel").orderByChild(Hotel)
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()){
                     for (snapshot in dataSnapshot.children) {
-                        val restoranName = snapshot.child("Restoran").getValue(String::class.java) ?: ""
+                        val HotelName = snapshot.child("Hotel").getValue(String::class.java) ?: ""
                         val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
                         val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
                         val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
@@ -81,13 +80,13 @@ class DetailsRestoranActivity : AppCompatActivity() {
 
                         val lat = latitude.toDouble()
                         val long = longitude.toDouble()
-                        namaRestoran.text = restoranName
-                        locRestoran.text = alamat
-                        Glide.with(this@DetailsRestoranActivity)
+                        namaHotel.text = HotelName
+                        locHotel.text = alamat
+                        Glide.with(this@DetailsHotelActivity)
                             .load(imageUrl)
-                            .into(imgRestoran)
+                            .into(imgHotel)
                         val bundle = Bundle().apply {
-                            putString("namaRestoran", restoranName)
+                            putString("namaHotel", HotelName)
                             putString("alamat", alamat)
                             putDouble("latitude", lat)
                             putDouble("longitude", long)
@@ -95,12 +94,12 @@ class DetailsRestoranActivity : AppCompatActivity() {
                         adapter.setData(bundle)
 
                         val fragmentList = mutableListOf(
-                            TentangRestoranFragment(),
-                            GalleryRestoranFragment(),
-                            UlasanRestoranFragment()
+                            TentangHotelFragment(),
+                            GalleryHotelFragment(),
+                            UlasanHotelFragment()
                         )
                         adapter.setFragmentList(fragmentList)
-                        setRatingTextByWisataName(restoran)
+                        setRatingTextByWisataName(Hotel)
 
                     }
                 }
@@ -113,9 +112,10 @@ class DetailsRestoranActivity : AppCompatActivity() {
             }
         })
     }
-    private fun setRatingTextByWisataName(restoran: String) {
+    private fun setRatingTextByWisataName(Hotel: String) {
         val databaseReference = FirebaseDatabase.getInstance().reference
-        databaseReference.child("UlasanRestoran").child(restoran).addValueEventListener(object : ValueEventListener {
+        databaseReference.child("UlasanHotel").child(Hotel).addValueEventListener(object :
+            ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 var totalRating = 0.0
                 var totalReviews = 0

@@ -9,11 +9,11 @@ import com.bumptech.glide.Glide
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Hotel
 
-class HotelAdapter(private val hotelList: List<Hotel>) : RecyclerView.Adapter<HotelAdapter.HotelViewHolder>() {
+class HotelAdapter(private val hotelList: List<Hotel>, private val onItemClick: (Hotel) -> Unit) : RecyclerView.Adapter<HotelAdapter.HotelViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HotelViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.terdekat_items, parent, false)
-        return HotelViewHolder(view)
+        return HotelViewHolder(view, onItemClick)
     }
 
     override fun onBindViewHolder(holder: HotelViewHolder, position: Int) {
@@ -25,7 +25,7 @@ class HotelAdapter(private val hotelList: List<Hotel>) : RecyclerView.Adapter<Ho
         return hotelList.size
     }
 
-    class HotelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class HotelViewHolder(itemView: View, private val onItemClick: (Hotel) -> Unit) : RecyclerView.ViewHolder(itemView) {
         fun bind(hotel: Hotel) {
 
             itemView.findViewById<TextView>(R.id.namaPenginapan).text = hotel.nama
@@ -36,6 +36,10 @@ class HotelAdapter(private val hotelList: List<Hotel>) : RecyclerView.Adapter<Ho
                 .load(hotel.imageUrl)
                 .into(itemView.findViewById(R.id.imgPenginapan))
             itemView.findViewById<TextView>(R.id.txtjarak).text = " ${hotel.jarak} Km"
+
+            itemView.setOnClickListener {
+                onItemClick(hotel)
+            }
         }
     }
 }

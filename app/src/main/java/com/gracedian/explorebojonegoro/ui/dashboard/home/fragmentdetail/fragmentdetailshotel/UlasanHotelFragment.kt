@@ -1,4 +1,4 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran
+package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailshotel
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -16,11 +16,10 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.AddUlasanFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.UlasanAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.UlasanItems
 
-class UlasanRestoranFragment : Fragment() {
+class UlasanHotelFragment : Fragment() {
     private lateinit var rcUlasan: RecyclerView
     private lateinit var btAddUlasan: LinearLayout
     private lateinit var ulasanList: MutableList<UlasanItems>
@@ -33,7 +32,7 @@ class UlasanRestoranFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_ulasan_restoran, container, false)
+        val view = inflater.inflate(R.layout.fragment_ulasan_hotel, container, false)
         databaseReference = FirebaseDatabase.getInstance().reference
         btAddUlasan = view.findViewById(R.id.btAddUlasan)
         rcUlasan = view.findViewById(R.id.rcUlasan)
@@ -42,26 +41,26 @@ class UlasanRestoranFragment : Fragment() {
         ulasanAdapter = UlasanAdapter(ulasanList)
         rcUlasan.adapter = ulasanAdapter
 
-        val namaRestoranText = arguments?.getString("namaRestoran")
-        val alamatRestoran = arguments?.getString("alamat")
+        val namaHotelText = arguments?.getString("namaHotel")
+        val alamatHotel = arguments?.getString("alamat")
 
         btAddUlasan.setOnClickListener {
-            val ulasanDialog = AddUlasanRestoranFragment()
+            val ulasanDialog = AddUlasanHotelFragment()
             val bundle = Bundle().apply {
-                putString("namaRestoran", namaRestoranText)
-                putString("alamat", alamatRestoran)
+                putString("namaHotel", namaHotelText)
+                putString("alamat", alamatHotel)
             }
             ulasanDialog.arguments = bundle
-            ulasanDialog.show(parentFragmentManager, "AddUlasanRestoranFragment")
+            ulasanDialog.show(parentFragmentManager, "AddUlasanHotelFragment")
         }
-        if (namaRestoranText != null) {
-            fetchUlasanData(namaRestoranText)
+        if (namaHotelText != null) {
+            fetchUlasanData(namaHotelText)
         }
         return view
     }
 
-    private fun fetchUlasanData(Restoran: String) {
-        databaseReference.child("UlasanRestoran").child(Restoran)
+    private fun fetchUlasanData(Hotel: String) {
+        databaseReference.child("UlasanHotel").child(Hotel)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {

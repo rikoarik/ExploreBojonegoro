@@ -30,9 +30,6 @@ class GaleriFragment : Fragment() {
     private lateinit var galeriAdapter: GaleriAdapter
     private lateinit var countTxt: TextView
 
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

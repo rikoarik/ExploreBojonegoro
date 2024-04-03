@@ -46,7 +46,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, PopularAdapter.OnItemClickListener{
+class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnItemClickListener{
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
     private lateinit var fusedLocationClient: FusedLocationProviderClient

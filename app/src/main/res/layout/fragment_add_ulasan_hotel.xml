@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.dashboard.home.fragmentdetail.fragmentdetailshotel.AddUlasanHotelFragment">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:elevation="20sp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/home_indicator"/>
+        <TextView
+            android:id="@+id/namaHotel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/inter_bold"
+            android:text="Hotel"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+
+        <LinearLayout
+            android:id="@+id/linearLayout8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/namaHotel">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_pin" />
+
+            <TextView
+                android:id="@+id/locHotel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_medium"
+                android:text="Desa Kedungsumber, Kecamatan Temayang, Kabupaten Bojonegoro, Jawa Timur"
+                android:textColor="@color/grey" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/txtAsd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/inter"
+            android:textAlignment="center"
+            android:text="Peringkat keseluruhan Anda untuk tujuan ini"
+            android:textColor="@color/grey" />
+        <RatingBar
+            android:id="@+id/ratingBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10sp"
+            android:isIndicator="false"
+            android:numStars="5"
+            style="@style/Widget.AppCompat.RatingBar.Indicator"
+            android:progressBackgroundTint="#BDBCBC"
+            android:progressTint="#FB9C10"/>
+        <TextView
+            android:id="@+id/txtAsdas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:fontFamily="@font/inter_medium"
+            android:layout_marginStart="10dp"
+            android:text="Tambahkan ulasan detail"
+            android:textColor="@color/grey" />
+
+        <EditText
+            android:id="@+id/editTextTextMultiLine"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:ems="10"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:elevation="20dp"
+            android:hint="Masukkan di sini..."
+            android:fontFamily="@font/inter"
+            android:textSize="16dp"
+            android:padding="10dp"
+            android:background="@drawable/bg_rounded_alpha"
+            android:backgroundTint="#ABC9FB"
+            android:gravity="start|top"
+            android:inputType="textMultiLine" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnApply"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tambah Ulasan"
+            android:layout_marginStart="20dp"
+            android:layout_margin="10dp"
+            android:paddingStart="60dp"
+            android:layout_weight="1"
+            android:paddingEnd="60dp"
+            android:fontFamily="@font/inter_semibold"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:background="@drawable/btn_rounded_blue"/>
+
+    </LinearLayout>
+
+
+</FrameLayout>

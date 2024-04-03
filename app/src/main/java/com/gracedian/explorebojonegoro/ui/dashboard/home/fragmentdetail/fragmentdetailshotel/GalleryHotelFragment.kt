@@ -1,4 +1,4 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran
+package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailshotel
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -22,7 +22,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 
-class GalleryRestoranFragment : Fragment() {
+class GalleryHotelFragment : Fragment() {
     private val PICK_IMAGE = 1
     private val galeriList = mutableListOf<String>()
     private lateinit var rcGallery: RecyclerView
@@ -34,7 +34,7 @@ class GalleryRestoranFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_gallery_restoran, container, false)
+        val view = inflater.inflate(R.layout.fragment_gallery_hotel, container, false)
 
         rcGallery = view.findViewById(R.id.rcgalery)
         countTxt = view.findViewById(R.id.countTxt)
@@ -65,9 +65,9 @@ class GalleryRestoranFragment : Fragment() {
     private fun uploadImageToFirebaseStorage(imageUri: Uri) {
         val storage = FirebaseStorage.getInstance()
         val storageRef: StorageReference = storage.reference
-        val namaRestoran = arguments?.getString("namaRestoran")
+        val namaHotel = arguments?.getString("namaHotel")
 
-        val fotoRef = storageRef.child("galeri/$namaRestoran/${UUID.randomUUID()}.jpg")
+        val fotoRef = storageRef.child("galeri/$namaHotel/${UUID.randomUUID()}.jpg")
 
         val imageStream = requireActivity().contentResolver.openInputStream(imageUri)
         val selectedImage =
@@ -93,11 +93,11 @@ class GalleryRestoranFragment : Fragment() {
     }
 
     private fun getImages() {
-        val namaRestoran = arguments?.getString("namaRestoran")
+        val namaHotel = arguments?.getString("namaHotel")
         val storage = FirebaseStorage.getInstance()
         val storageRef: StorageReference = storage.reference
 
-        val galeriRef = storageRef.child("galeri/$namaRestoran")
+        val galeriRef = storageRef.child("galeri/$namaHotel")
 
         galeriRef.listAll()
             .addOnSuccessListener { listResult ->
