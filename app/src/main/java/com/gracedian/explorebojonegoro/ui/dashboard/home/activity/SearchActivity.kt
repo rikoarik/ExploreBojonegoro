@@ -1,4 +1,4 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.home
+package com.gracedian.explorebojonegoro.ui.dashboard.home.activity
 
 import android.content.Context
 import android.content.Intent
@@ -22,18 +22,11 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
+import com.gracedian.explorebojonegoro.ui.dashboard.home.FilterBottomSheetFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.SearchAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.SearchItem
-import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
-import kotlin.math.abs
-import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
-import kotlin.math.tan
 
 class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
 

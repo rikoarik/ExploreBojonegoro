@@ -25,9 +25,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.item.User
-import com.gracedian.explorebojonegoro.ui.dashboard.home.SearchActivity
 import com.gracedian.explorebojonegoro.ui.welcome.WelcomeActivity
-import de.hdodenhof.circleimageview.CircleImageView
 
 class ProfileFragment : Fragment() {
 

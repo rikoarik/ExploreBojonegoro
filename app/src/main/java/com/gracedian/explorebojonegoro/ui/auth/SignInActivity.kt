@@ -126,10 +126,13 @@ class SignInActivity : AppCompatActivity() {
                         throw task.exception!!
                     } catch (e: FirebaseAuthInvalidUserException) {
                         Toast.makeText(this, "Email tidak valid atau tidak terdaftar", Toast.LENGTH_SHORT).show()
+                        loading.visibility = View.GONE
                     } catch (e: FirebaseAuthInvalidCredentialsException) {
                         Toast.makeText(this, "Password salah", Toast.LENGTH_SHORT).show()
+                        loading.visibility = View.GONE
                     } catch (e: Exception) {
                         Toast.makeText(this, "Masalah saat masuk: " + e.message, Toast.LENGTH_SHORT).show()
+                        loading.visibility = View.GONE
                     }
                 }
             }

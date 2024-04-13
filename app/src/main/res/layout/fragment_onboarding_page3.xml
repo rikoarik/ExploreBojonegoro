@@ -31,7 +31,6 @@
             android:fontFamily="@font/inter_semibold"
             android:layout_marginTop="16sp"
             android:lineSpacingExtra="4sp"
-            android:translationY="-2.03sp"
             android:gravity="center_horizontal|top"
             android:alpha="0.6"/>
     </LinearLayout>

@@ -1,6 +1,9 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.home
+package com.gracedian.explorebojonegoro.ui.dashboard.home.activity
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +11,12 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.viewpager.widget.ViewPager
+import androidx.appcompat.widget.AppCompatButton
+import androidx.core.app.ActivityCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
@@ -25,7 +31,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.Penginap
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.RestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.TentangFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.UlasanFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.UlasanItems
+import com.gracedian.explorebojonegoro.ui.navigateroute.RouteNavigateActivity
 
 class DetailsWisataActivity : AppCompatActivity() {
 
@@ -37,17 +43,42 @@ class DetailsWisataActivity : AppCompatActivity() {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager2
     private lateinit var btBack: ImageView
+    private lateinit var btNavigasi: AppCompatButton
     private lateinit var btFavorite: ImageButton
     private lateinit var adapter: DetailsPagerAdapter
-
+    private var lat: Double = 0.0
+    private var long: Double = 0.0
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details_wisata)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         init()
         getData()
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    val currentLat = it.latitude
+                    val currentLong = it.longitude
 
+                    // Simpan koordinat ini ke intent sebelum memulai RouteNavigateActivity
+                    btNavigasi.setOnClickListener {
+                        val intent = Intent(this, RouteNavigateActivity::class.java)
+                        intent.putExtra("latDestination", lat)
+                        intent.putExtra("longDestination", long)
+                        intent.putExtra("latOrigin", currentLat)
+                        intent.putExtra("longOrigin", currentLong)
+                        startActivity(intent)
+                    }
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+        }
         btBack.setOnClickListener {
             finish()
         }
@@ -62,6 +93,7 @@ class DetailsWisataActivity : AppCompatActivity() {
         tabLayout = findViewById(R.id.tabLayout)
         viewPager = findViewById(R.id.viewPager)
         btBack = findViewById(R.id.btBack)
+        btNavigasi = findViewById(R.id.btNavigasi)
         btFavorite = findViewById(R.id.btFavorite)
 
         adapter = DetailsPagerAdapter(this)
@@ -97,8 +129,8 @@ class DetailsWisataActivity : AppCompatActivity() {
                         val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
                         val kategori = childSnapshot.child("kategori").getValue(String::class.java)
 
-                        val lat = latString?.toDoubleOrNull() ?: 0.0
-                        val long = longString?.toDoubleOrNull() ?: 0.0
+                        lat = latString?.toDoubleOrNull() ?: 0.0
+                        long = longString?.toDoubleOrNull() ?: 0.0
                         if (wisata != null) {
                             setRatingTextByWisataName(wisata)
                         }

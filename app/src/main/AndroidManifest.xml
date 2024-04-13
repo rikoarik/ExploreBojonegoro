@@ -19,13 +19,16 @@
         android:theme="@style/Theme.ExploreBojonegoro"
         tools:targetApi="tiramisu">
         <activity
-            android:name=".ui.dashboard.home.fragmentdetail.DetailsHotelActivity"
+            android:name=".ui.navigateroute.RouteNavigateActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.dashboard.home.fragmentdetail.DetailsRestoranActivity"
+            android:name=".ui.dashboard.home.fragmentdetail.activity.DetailsHotelActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.dashboard.home.DetailsWisataActivity"
+            android:name=".ui.dashboard.home.fragmentdetail.activity.DetailsRestoranActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.dashboard.home.activity.DetailsWisataActivity"
             android:exported="false" />
         <activity
             android:name=".ui.dashboard.profile.UpdatePasswordActivity"
@@ -37,7 +40,7 @@
             android:name=".ui.auth.ForgotPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.dashboard.home.SearchActivity"
+            android:name=".ui.dashboard.home.activity.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.RegisterActivity"

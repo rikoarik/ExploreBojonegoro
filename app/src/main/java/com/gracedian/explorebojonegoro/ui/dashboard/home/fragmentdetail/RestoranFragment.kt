@@ -14,9 +14,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.HotelAdapter
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.activity.DetailsRestoranActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.RestoranAdapter
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Hotel
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Restoran
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
 import kotlin.math.max

@@ -34,11 +34,13 @@ import com.google.firebase.database.ValueEventListener
 import kotlin.math.*
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.item.User
+import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
+import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.SearchActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.PopularAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.PopularAdapter.OnItemClickListener
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.apiservice.WeatherRetrofit
-import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.PopularItem
+import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.PopularItem
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
 import kotlinx.coroutines.*
@@ -180,45 +182,42 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             getLocation()
         }
     }
-    private fun getLocation(){
+    private fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            ) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+            // TODO: Request the missing permissions here
             return
         }
+
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
-                location?.let {
-                    currentLocation = it
-                    val latitude = it.latitude
-                    val longitude = it.longitude
-                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                    try {
-                        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
-                        if (addresses!!.isNotEmpty()) {
-                            val cityName = addresses[0].locality
-                            locSaatIni.text = cityName
-                            getWeatherData(latitude, longitude)
-
+                location?.let { loc ->
+                    currentLocation = loc
+                    val latitude = loc.latitude
+                    val longitude = loc.longitude
+                    context?.let { ctx ->
+                        val geocoder = Geocoder(ctx, Locale.getDefault())
+                        try {
+                            val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+                            addresses?.firstOrNull()?.locality?.let { cityName ->
+                                locSaatIni.text = cityName
+                                getWeatherData(latitude, longitude)
+                            }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
-                    } catch (e: IOException) {
-                        e.printStackTrace()
                     }
                 }
             }
     }
+
     private fun getUser() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {

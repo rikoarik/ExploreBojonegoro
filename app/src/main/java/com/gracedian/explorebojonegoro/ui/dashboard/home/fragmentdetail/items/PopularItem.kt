@@ -1,4 +1,4 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail
+package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items
 
 data class PopularItem(
     val imageUrl: String?,

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.ExploreBojonegoro" parent="Theme.Material3.Light.NoActionBar" >
-        <item name="colorOnPrimary">@color/white</item>
+    <style name="Theme.ExploreBojonegoro" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="colorOnPrimary">#00FFFFFF</item>
         <item name="android:statusBarColor">#00FFFFFF</item>
         <item name="colorControlHighlight">@color/primary</item>
         <item name="android:fontFamily">@font/inter</item>

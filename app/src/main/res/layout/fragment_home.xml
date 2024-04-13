@@ -107,7 +107,6 @@
                         android:orientation="horizontal"
                         android:padding="10dp">
 
-                        <!-- Tanggal -->
                         <TextView
                             android:id="@+id/tgltxt"
                             android:layout_width="0dp"
@@ -117,7 +116,6 @@
                             android:fontFamily="@font/inter_semibold"
                             android:text="Tanggal: DD/MM/YYYY" />
 
-                        <!-- Jam -->
                         <TextView
                             android:id="@+id/jamtxt"
                             android:layout_width="wrap_content"
@@ -203,14 +201,6 @@
                         android:textColor="@color/textBlack"
                         android:textSize="20sp" />
 
-                    <TextView
-                        android:id="@+id/btAllPopular"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter"
-                        android:text="Lihat Semua"
-                        android:textColor="@color/primary"
-                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <!-- RecyclerView Populer -->
@@ -249,13 +239,6 @@
                         android:textColor="@color/textBlack"
                         android:textSize="20sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/inter"
-                        android:text="Lihat Semua"
-                        android:textColor="@color/primary"
-                        android:textSize="15sp" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
