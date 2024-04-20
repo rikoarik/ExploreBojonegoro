@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -58,27 +59,7 @@ class DetailsWisataActivity : AppCompatActivity() {
 
         init()
         getData()
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                location?.let {
-                    val currentLat = it.latitude
-                    val currentLong = it.longitude
-
-                    // Simpan koordinat ini ke intent sebelum memulai RouteNavigateActivity
-                    btNavigasi.setOnClickListener {
-                        val intent = Intent(this, RouteNavigateActivity::class.java)
-                        intent.putExtra("latDestination", lat)
-                        intent.putExtra("longDestination", long)
-                        intent.putExtra("latOrigin", currentLat)
-                        intent.putExtra("longOrigin", currentLong)
-                        startActivity(intent)
-                    }
-                }
-            }
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), 1)
-        }
+        routeNavigating()
         btBack.setOnClickListener {
             finish()
         }
@@ -275,6 +256,34 @@ class DetailsWisataActivity : AppCompatActivity() {
                 // Handle error
             }
         })
+    }
+
+    private fun routeNavigating(){
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    val originLat = it.latitude
+                    val originLong = it.longitude
+                    val destinationLat = lat
+                    val destinationLong = long
+                    btNavigasi.setOnClickListener {
+
+                        val intent = Intent(this, RouteNavigateActivity::class.java)
+                        intent.putExtra("type", "wisata")
+                        intent.putExtra("namaWisata", namaWisata.text)
+                        intent.putExtra("latOrigin", originLat)
+                        intent.putExtra("longOrigin", originLong)
+                        intent.putExtra("latDestination", destinationLat)
+                        intent.putExtra("longDestination", destinationLong)
+                        startActivity(intent)
+
+                    }
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+        }
     }
 
 

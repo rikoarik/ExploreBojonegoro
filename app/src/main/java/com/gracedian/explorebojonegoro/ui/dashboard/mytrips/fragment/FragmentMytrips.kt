@@ -1,60 +1,317 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.mytrips.fragment
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
+import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
+import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
+import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
+import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import kotlin.math.max
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [FragmentMytrips.newInstance] factory method to
- * create an instance of this fragment.
- */
-class FragmentMytrips : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class FragmentMytrips : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: WisataTerdekatAdapter
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val wishlistItems = mutableListOf<WisataTerdekatItem>()
+    private var currentLocation: Location? = null
+    private lateinit var databaseReference: DatabaseReference
 
+    private lateinit var handler: Handler
+    private lateinit var runnable: Runnable
+
+    @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mytrips, container, false)
+        val view = inflater.inflate(R.layout.fragment_mytrips, container, false)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+        recyclerView = view.findViewById(R.id.rcMyTrips)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = WisataTerdekatAdapter(wishlistItems, this)
+        recyclerView.adapter = adapter
+
+
+        return view
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FragmentMytrips.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FragmentMytrips().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        getLocation()
+        getDestinationsFromFirebase()
+
+    }
+
+    private fun getLocation() {
+        if (ActivityCompat.checkSelfPermission(
+                this.requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this.requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return
+        }
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let {
+                    currentLocation = it
                 }
             }
+    }
+
+    private fun getDestinationsFromFirebase() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let {
+            val destinationsRef = databaseReference.child("users").child(userId).child("destinations")
+            destinationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (destinationSnapshot in dataSnapshot.children) {
+                        val name = destinationSnapshot.child("name").getValue(String::class.java)
+                        name?.let { it1 -> getDataWisataTerdekat(it1) }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("Failed to read value:", databaseError.toException().toString())
+                }
+            })
+        }
+    }
+
+
+
+    private fun getDataWisataTerdekat(wisata: String) {
+        val db = FirebaseDatabase.getInstance().getReference("objekwisata")
+        val query = db.orderByChild("wisata").equalTo(wisata)
+        query.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (childSnapshot in dataSnapshot.children) {
+                        val wisata = childSnapshot.child("wisata").getValue(String::class.java)
+                        val alamat = childSnapshot.child("alamat").getValue(String::class.java)
+                        val latString = childSnapshot.child("latitude").getValue(String::class.java)
+                        val longString =
+                            childSnapshot.child("longitude").getValue(String::class.java)
+                        val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
+
+                        val lat = latString?.toDoubleOrNull() ?: 0.0
+                        val long = longString?.toDoubleOrNull() ?: 0.0
+
+                        val jarak = calculateVincentyDistance(
+                            currentLocation?.latitude ?: 0.0,
+                            currentLocation?.longitude ?: 0.0,
+                            lat,
+                            long
+                        ) / 1000
+
+                        val intValue = jarak.toInt()
+
+                        val wisataTerdekatItem = WisataTerdekatItem(
+                            imageUrl = imageUrl,
+                            wisata = wisata,
+                            rating = 0.0,
+                            alamat = alamat,
+                            jarak = intValue,
+                            lat = lat,
+                            long = long,
+                        )
+                        wishlistItems.add(wisataTerdekatItem)
+
+                        if (wisata != null) {
+                            setRatingTextByWisataName(wisata)
+                        }
+                    }
+                    wishlistItems.sortBy { it.jarak }
+                    recyclerView.adapter = adapter
+
+                    adapter.notifyDataSetChanged()
+
+                }
+                handler = Handler()
+                runnable = kotlinx.coroutines.Runnable { getFavoriteItems() }
+                handler.post(runnable)
+
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("GetData", "Error: ${databaseError.message}")
+            }
+        })
+    }
+
+    override fun onItemTerdekatClick(position: Int) {
+        val terdekatItem = wishlistItems[position]
+        val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
+        intent.putExtra("wisata", terdekatItem.wisata)
+        startActivity(intent)
+    }
+
+    override fun onFavoriteClick(position: Int) {
+        val favoriteItem = wishlistItems[position]
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        wishlistItems.clear()
+
+        if (userId != null) {
+            val favoritesRef =
+                FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
+
+            val newFavoriteStatus = !favoriteItem.isFavorite
+
+            if (newFavoriteStatus) {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(true)
+                        .addOnSuccessListener {
+                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)
+                                ?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_true)
+                            showToast("Wisata ditambahkan ke wishlist")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Gagal untuk menambahkan wisata ke wihslist: ${e.message}")
+                        }
+                }
+            } else {
+                favoriteItem.wisata?.let {
+                    favoritesRef.child(it).setValue(false)
+                        .addOnSuccessListener {
+                            val imageView = recyclerView.layoutManager?.findViewByPosition(position)
+                                ?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_false)
+                            showToast("Wisata dihapus dari wishlist")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to remove item from favorites: ${e.message}")
+                        }
+                }
+
+            }
+
+        }
+
+    }
+
+    private fun getFavoriteItems() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let { uid ->
+            val favoritesRef =
+                FirebaseDatabase.getInstance().reference.child("favorites").child(uid)
+            favoritesRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (childSnapshot in snapshot.children) {
+                        val itemId = childSnapshot.key
+                        val isFavorite = childSnapshot.getValue(Boolean::class.java)
+                        for (item in wishlistItems) {
+                            if (item.wisata == itemId) {
+                                item.isFavorite = isFavorite ?: false
+                                val position = wishlistItems.indexOf(item)
+                                val imageView =
+                                    recyclerView.layoutManager?.findViewByPosition(position)
+                                        ?.findViewById<ImageView>(R.id.btFavorite)
+                                if (isFavorite == true) {
+                                    imageView?.setImageResource(R.drawable.ic_favorite_true)
+                                }
+
+                                break
+                            }
+
+                        }
+                        adapter.notifyDataSetChanged()
+                        handler.postDelayed(runnable, 1000)
+                    }
+
+                }
+
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("getFavoriteItems", "Error: ${error.message}")
+                }
+            })
+        }
+    }
+
+    private fun setRatingTextByWisataName(wisata: String) {
+        val databaseReference = FirebaseDatabase.getInstance().reference
+        databaseReference.child("Ulasan").child(wisata)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var totalRating = 0.0
+                    var totalReviews = 0
+                    if (snapshot.exists()) {
+                        for (ulasanSnapshot in snapshot.children) {
+                            val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                            rating?.let {
+                                totalRating += it
+                                totalReviews++
+                            } ?: run {
+                                Log.e(
+                                    "Rating",
+                                    "Null value found for rating in ulasan: ${ulasanSnapshot.key}"
+                                )
+                            }
+                        }
+
+                        totalReviews = max(totalReviews, 1)
+
+                        val averageRating = totalRating / totalReviews
+                        for (item in wishlistItems) {
+                            if (item.wisata == wisata) {
+                                item.rating = averageRating
+                            }
+                        }
+
+
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Database error: ${error.message}")
+                    // Handle error
+                }
+            })
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        handler.removeCallbacks(runnable)
     }
 }

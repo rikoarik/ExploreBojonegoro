@@ -1,13 +1,19 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.activity
 
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.app.ActivityCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.database.DataSnapshot
@@ -19,6 +25,8 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter.
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.GalleryRestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.TentangRestoranFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmentdetailsrestoran.UlasanRestoranFragment
+import com.gracedian.explorebojonegoro.ui.navigateroute.RouteNavigateActivity
+
 
 class DetailsRestoranActivity : AppCompatActivity() {
 
@@ -31,10 +39,15 @@ class DetailsRestoranActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private lateinit var btNavigasi: AppCompatButton
     private lateinit var adapter: RestoranDetailsPagerAdapter
+    private var lat: Double = 0.0
+    private var long: Double = 0.0
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_details_restoran)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         init()
         fetchRestoranData()
@@ -61,6 +74,10 @@ class DetailsRestoranActivity : AppCompatActivity() {
                 else -> ""
             }
         }.attach()
+
+        btNavigasi.setOnClickListener {
+            routeNavigating()
+        }
     }
     private fun fetchRestoranData() {
         val restoran = intent.getStringExtra("nama_restoran").toString()
@@ -75,8 +92,8 @@ class DetailsRestoranActivity : AppCompatActivity() {
                         val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
                         val longitude = snapshot.child("longitude").getValue(String::class.java) ?: ""
 
-                        val lat = latitude.toDouble()
-                        val long = longitude.toDouble()
+                        lat = latitude.toDouble()
+                        long = longitude.toDouble()
                         namaRestoran.text = restoranName
                         locRestoran.text = alamat
                         Glide.with(this@DetailsRestoranActivity)
@@ -138,5 +155,33 @@ class DetailsRestoranActivity : AppCompatActivity() {
             }
         })
     }
+    private fun routeNavigating(){
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+            ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                location?.let {
+                    val originLat = it.latitude
+                    val originLong = it.longitude
+                    val destinationLat = lat
+                    val destinationLong = long
+                    btNavigasi.setOnClickListener {
+
+                        val intent = Intent(this, RouteNavigateActivity::class.java)
+                        intent.putExtra("type", "wisata")
+                        intent.putExtra("namaWisata", namaRestoran.text)
+                        intent.putExtra("latOrigin", originLat)
+                        intent.putExtra("longOrigin", originLong)
+                        intent.putExtra("latDestination", destinationLat)
+                        intent.putExtra("longDestination", destinationLong)
+                        startActivity(intent)
+
+                    }
+                }
+            }
+        } else {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION), 1)
+        }
+    }
+
 
 }

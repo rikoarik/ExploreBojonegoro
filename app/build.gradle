@@ -19,13 +19,30 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+    packagingOptions {
+        pickFirst "lib/**/libc++_shared.so"
+    }
 
     buildTypes {
         release {
+            resValue "string", 'mapbox_access_token', (project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: "")
+
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            // these two keys for debuging
+            resValue "string", 'mapbox_access_token', (project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: "")
+
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,6 +50,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
 
 }
 
@@ -49,7 +67,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database-ktx:20.3.1'
     implementation 'com.google.android.gms:play-services-maps:18.2.0'
     implementation 'com.google.maps:google-maps-services:0.19.0'
-    implementation 'com.google.android.gms:play-services-location:21.2.0'
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
     implementation 'com.google.firebase:firebase-database:20.3.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.3.0'
     implementation 'androidx.activity:activity:1.8.0'
@@ -68,6 +86,24 @@ dependencies {
     implementation 'com.xw.repo:bubbleseekbar:3.20-lite'
     implementation 'com.gauravk.bubblenavigation:bubblenavigation:1.0.7'
     implementation  'io.ak1:bubbletabbar:1.0.8'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    // SDP layout size
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    // SSP Text sizes
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+
+    // required to avoid crash on Android 12 API 31
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
+
+
+    /*mapbox*/
+    implementation 'com.mapbox.maps:android:10.7.0'
+    implementation 'com.mapbox.navigation:android:2.6.0'
+
+
+
 
 
 }
