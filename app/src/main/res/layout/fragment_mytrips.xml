@@ -19,7 +19,7 @@
             android:background="@drawable/bg_search"
             android:drawableLeft="@drawable/ic_searchblue"
             android:drawablePadding="8dp"
-            android:fontFamily="@font/inter_medium"
+            android:fontFamily="@font/inter"
             android:hint="Cari tujuan Anda"
             android:imeOptions="actionSearch"
             android:inputType="text"

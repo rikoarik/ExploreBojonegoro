@@ -1,20 +1,17 @@
-package com.gracedian.explorebojonegoro.ui.dashboard.mytrips.fragment
+package com.gracedian.explorebojonegoro.ui.dashboard.profile
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -27,16 +24,14 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
-import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.ui.dashboard.profile.adapter.HistoryTripsAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.profile.item.HistoryTrips
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
-import kotlin.math.max
 
+class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClickListener {
 
-class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
-
+    private lateinit var btBack: ImageView
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HistoryTripsAdapter
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -46,31 +41,29 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
 
     private var date: String = ""
 
-    @SuppressLint("MissingInflatedId")
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_mytrips, container, false)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_history_trips)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         databaseReference = FirebaseDatabase.getInstance().reference
-        recyclerView = view.findViewById(R.id.rcMyTrips)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView = findViewById(R.id.rcMyTrips)
+        btBack = findViewById(R.id.btBack)
+        recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = HistoryTripsAdapter(wishlistItems, this)
         recyclerView.adapter = adapter
+
+        btBack.setOnClickListener {
+            finish()
+        }
         getLocation()
         getDestinationsFromFirebase()
-
-        return view
     }
-
-
     private fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
-                this.requireContext(),
+                this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this.requireContext(),
+                this,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
@@ -176,11 +169,8 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
 
     override fun onItemTerdekatClick(position: Int) {
         val terdekatItem = wishlistItems[position]
-        val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
+        val intent = Intent(this, DetailsWisataActivity::class.java)
         intent.putExtra("wisata", terdekatItem.wisata)
         startActivity(intent)
     }
-
-
-
 }

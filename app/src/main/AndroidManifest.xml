@@ -17,7 +17,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ExploreBojonegoro"
+        android:useEmbeddedDex="true"
         tools:targetApi="tiramisu">
+        <activity
+            android:name=".ui.dashboard.profile.WishListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.dashboard.profile.HistoryTripsActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.navigateroute.RouteNavigateActivity"
             android:exported="false" />

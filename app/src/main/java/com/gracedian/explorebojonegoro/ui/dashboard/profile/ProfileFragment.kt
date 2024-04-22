@@ -78,11 +78,13 @@ class ProfileFragment : Fragment() {
         }
 
         historyPerjalanan.setOnClickListener {
-            // Aksi saat historyPerjalanan diklik
+            val intent = Intent(requireActivity(), HistoryTripsActivity::class.java)
+            startActivity(intent)
         }
 
         wishlist.setOnClickListener {
-            // Aksi saat wishlist diklik
+            val intent = Intent(requireActivity(), WishListActivity::class.java)
+            startActivity(intent)
         }
 
         logOut.setOnClickListener {

@@ -93,6 +93,8 @@ import com.mapbox.navigation.ui.voice.model.SpeechError
 import com.mapbox.navigation.ui.voice.model.SpeechValue
 import com.mapbox.navigation.ui.voice.model.SpeechVolume
 import com.mapbox.navigation.ui.voice.view.MapboxSoundButton
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
 
 
@@ -606,10 +608,13 @@ class RouteNavigateActivity() : AppCompatActivity() {
         if (destinationKey != null) {
             val finishDialog = FinishNavigateDialog(type)
             finishDialog.show(supportFragmentManager, finishDialog.tag)
-
+            val calendar = Calendar.getInstance()
+            val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+            val formattedDate = dateFormat.format(calendar.time)
             if (type == "wisata") {
                 val destinationData = hashMapOf(
-                    "name" to name
+                    "name" to name,
+                    "date" to formattedDate
                 )
                 databaseReference.child("users").child(userId).child("destinations").child(destinationKey).setValue(destinationData)
                     .addOnSuccessListener {
@@ -621,8 +626,4 @@ class RouteNavigateActivity() : AppCompatActivity() {
             }
         }
     }
-
-
-
-
 }

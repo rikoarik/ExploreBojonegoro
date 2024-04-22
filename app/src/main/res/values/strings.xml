@@ -8,6 +8,7 @@
         <item name="textAllCaps">false</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
     <string name="navigate">Navigate</string>
     <string name="main_menu">Main Menu</string>
     <string name="basic_driving_app">Basic driving app</string>
