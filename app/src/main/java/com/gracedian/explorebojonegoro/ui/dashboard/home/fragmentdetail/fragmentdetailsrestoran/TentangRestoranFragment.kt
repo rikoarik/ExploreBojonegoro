@@ -20,6 +20,7 @@ class TentangRestoranFragment : Fragment() {
     private lateinit var descTxt: TextView
     private lateinit var listLainLain: TextView
     private lateinit var namaRestoran: String
+    private lateinit var fasilitas: TextView
 
 
     @SuppressLint("MissingInflatedId")
@@ -32,6 +33,7 @@ class TentangRestoranFragment : Fragment() {
 
         descTxt = view.findViewById(R.id.descTxt)
         listLainLain = view.findViewById(R.id.listLainLain)
+        fasilitas = view.findViewById(R.id.rcFasilitas)
         getData()
         return view
     }
@@ -45,7 +47,13 @@ class TentangRestoranFragment : Fragment() {
                     for (childSnapshot in dataSnapshot.children) {
                         val deskripsi = childSnapshot.child("deskripsi").getValue(String::class.java)
                         val lainLain = childSnapshot.child("lainLain").getValue(String::class.java)
-
+                        val fasilitasSnapshot = childSnapshot.child("fasilitas")
+                        val fasilitasList = mutableListOf<String>()
+                        for (fasilitas in fasilitasSnapshot.children) {
+                            fasilitasList.add(fasilitas.getValue(String::class.java) ?: "")
+                        }
+                        val fasilitasText = fasilitasList.joinToString("\n")
+                        fasilitas.text = fasilitasText
                         descTxt.text = deskripsi
                         listLainLain.text = lainLain
                     }

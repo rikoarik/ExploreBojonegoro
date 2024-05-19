@@ -40,7 +40,6 @@ class ProfileFragment : Fragment() {
     private lateinit var logOut: LinearLayout
     private lateinit var loadingProgressBar: ProgressBar
 
-
     private lateinit var auth: FirebaseAuth
     private lateinit var database: FirebaseDatabase
     private var userImageURL: String? = ""

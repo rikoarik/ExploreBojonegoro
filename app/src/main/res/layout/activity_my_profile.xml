@@ -8,7 +8,12 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
         <ImageView
             android:id="@+id/btBack"
             android:layout_width="50dp"
@@ -47,15 +52,16 @@
             android:id="@+id/changeImg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/inter_medium"
             android:text="Ganti gambar profil"
             android:textAlignment="center"
             android:textColor="@color/primary"
             android:textSize="18sp"
-            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgUserProfile" />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutName"
             android:layout_width="match_parent"
@@ -74,7 +80,7 @@
                 android:hint="Nama"
                 android:inputType="textPersonName"
                 android:textColor="@color/black"
-              
+
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -85,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutName">
@@ -96,19 +102,20 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter"
                 android:hint="Email"
-                android:textColor="@color/black"
                 android:inputType="textEmailAddress"
-              
+                android:textColor="@color/black"
+
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputLayoutPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20sp"
             android:elevation="10sp"
-            
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutEmail">
@@ -119,8 +126,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/inter"
                 android:hint="No. tlp"
-                android:textColor="@color/black"
                 android:inputType="phone|number"
+                android:textColor="@color/black"
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -129,52 +136,57 @@
             android:id="@+id/inputLayoutConfirmPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20sp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
             android:elevation="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputLayoutPassword">
+            app:layout_constraintTop_toBottomOf="@+id/inputLayoutPassword"
+            app:layout_constraintVertical_bias="0.0">
 
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            <AutoCompleteTextView
                 android:id="@+id/autoCompleteGender"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
+                android:editable="false"
                 android:fontFamily="@font/inter"
                 android:hint="Jenis Kelamin"
                 android:inputType="text"
-                android:editable="false"
-                android:paddingStart="15dp"
                 android:textColor="@color/black"
                 android:textColorHint="@color/hint"
                 android:textSize="16sp" />
 
         </com.google.android.material.textfield.TextInputLayout>
+
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/buttonEditProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="30dp"
-            android:layout_marginTop="30dp"
             android:layout_marginEnd="30dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/btn_rounded_blue"
             android:fontFamily="@font/inter_bold"
             android:text="Edit Profile"
             android:textAllCaps="false"
-            android:textSize="18sp"
             android:textColor="@color/white"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputLayoutConfirmPassword" />
+
         <TextView
             android:id="@+id/btCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/inter_medium"
             android:text="Batal"
             android:textAlignment="center"
             android:textColor="@color/primary"
             android:textSize="18sp"
-            android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/buttonEditProfile" />

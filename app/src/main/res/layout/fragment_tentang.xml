@@ -34,12 +34,11 @@
                 android:text="Fasilitas"
                 android:textColor="@color/black"
                 android:fontFamily="@font/inter_bold"/>
-            <androidx.recyclerview.widget.RecyclerView
+            <TextView
                 android:id="@+id/rcFasilitas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                tools:itemCount="6"/>
+                android:orientation="horizontal"/>
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

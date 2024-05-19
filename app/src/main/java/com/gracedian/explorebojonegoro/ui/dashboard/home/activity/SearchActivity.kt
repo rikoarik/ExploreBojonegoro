@@ -1,5 +1,6 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -100,6 +101,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                 if (query.isEmpty()){
                     notFoundImageView.visibility = View.GONE
                     getData()
+
                 }
             }
         })
@@ -127,6 +129,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
 
     private fun getData() {
         databaseReference.addValueEventListener(object : ValueEventListener {
+            @SuppressLint("NotifyDataSetChanged", "SetTextI18n")
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val previousFavorites = mutableMapOf<String, Boolean>() // Store previous favorite status
                 for (item in searchItemsList) {
@@ -154,11 +157,12 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         val searchItem = SearchItem(
                             imageUrl = imageUrl,
                             wisata = title,
+                            kategori = category,
                             alamat = location,
                             rating = 0.0,
                             jarak = intValue
                         )
-                        if (isRatingMatch(searchItem) && isJarakMaxMatch(searchItem)) {
+                        if (isCategoryMatch(searchItem) && isRatingMatch(searchItem) && isJarakMaxMatch(searchItem)) {
                             searchItemsList.add(searchItem)
                         }
                         if (title != null) {
@@ -179,15 +183,15 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     }
     private fun filterSearchResults(query: String) {
         val filteredItems = searchItemsList.filter { searchItem ->
+            val isQueryMatch = isQueryMatch(searchItem, query)
+            val isCategoryMatch = isCategoryMatch(searchItem)
             val isRatingMatch = isRatingMatch(searchItem)
             val isJarakMaxMatch = isJarakMaxMatch(searchItem)
-            val isQueryMatch = isQueryMatch(searchItem, query)
 
-            isRatingMatch && isJarakMaxMatch && isQueryMatch
+            isQueryMatch && isCategoryMatch && isRatingMatch && isJarakMaxMatch
         }
 
         updateFilteredItemsView(filteredItems)
-
     }
 
     private fun isRatingMatch(searchItem: SearchItem): Boolean {
@@ -197,7 +201,9 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     private fun isJarakMaxMatch(searchItem: SearchItem): Boolean {
         return appliedJarakMax == 0 || searchItem.jarak!! <= appliedJarakMax
     }
-
+    private fun isCategoryMatch(searchItem: SearchItem): Boolean {
+        return appliedCategory == "" || searchItem.kategori == appliedCategory
+    }
     private fun isQueryMatch(searchItem: SearchItem, query: String): Boolean {
         return searchItem.wisata?.contains(query, ignoreCase = true) == true
     }
@@ -214,8 +220,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
         }
     }
 
-
-
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         super.onBackPressed()
         SharedPrefManager.saveFilterPreferences(this, "Pilih Kategori", 0.0F, 0)

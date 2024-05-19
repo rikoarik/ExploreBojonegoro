@@ -72,7 +72,6 @@ class MyProfileActivity : AppCompatActivity() {
         autoCompleteGender = findViewById(R.id.autoCompleteGender)
         editButton = findViewById(R.id.buttonEditProfile)
         loadingBar = findViewById(R.id.loadingBar)
-
         inputEmail.isEnabled = false
 
         setFieldsEditable(false)
@@ -162,6 +161,7 @@ class MyProfileActivity : AppCompatActivity() {
                         Toast.makeText(this, "Data Profile berhasil diperbarui", Toast.LENGTH_SHORT).show()
                         loadingBar.visibility = View.GONE
                         changeImgProfile.visibility = View.GONE
+                        btCancel.visibility = View.GONE
                         setFieldsEditable(false)
                         editButton.text = "Edit Profile"
                     }
