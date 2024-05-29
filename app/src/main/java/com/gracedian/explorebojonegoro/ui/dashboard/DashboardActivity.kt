@@ -4,19 +4,12 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.maps.MapsFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.MyTripsFragment
-import com.gracedian.explorebojonegoro.ui.dashboard.profile.ProfileFragment
 import io.ak1.BubbleTabBar
 
 class DashboardActivity : AppCompatActivity() {
@@ -25,7 +18,6 @@ class DashboardActivity : AppCompatActivity() {
     private lateinit var viewPager: ViewPager2
     private var selectedId: Int = 0
     private var doubleBackToExitPressedOnce = false
-    private val backPressHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

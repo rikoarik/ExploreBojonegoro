@@ -6,13 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
-import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.DashboardActivity
-import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.adapter.MyTripsPagerAdapter
 
 class MyTripsFragment : Fragment() {
@@ -38,7 +35,7 @@ class MyTripsFragment : Fragment() {
                 1 -> tab.text = "My Trips"
             }
         }.attach()
-        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (viewPager.currentItem > 0) {
                     viewPager.setCurrentItem(viewPager.currentItem - 1, true)
