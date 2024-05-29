@@ -14,7 +14,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatIte
 import java.lang.Integer.min
 
 class WisataTerdekatAdapter(
-    private val wisataTerdekatList: List<WisataTerdekatItem>,
+    private var wisataTerdekatList: MutableList<WisataTerdekatItem>,
     private val itemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<WisataTerdekatAdapter.WisataTerdekatViewHolder>() {
 
@@ -22,6 +22,7 @@ class WisataTerdekatAdapter(
         fun onItemTerdekatClick(position: Int)
         fun onFavoriteClick(position: Int)
     }
+
 
     class WisataTerdekatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val imgWisata = itemView.findViewById<ImageView>(R.id.imgWisata)
@@ -61,6 +62,14 @@ class WisataTerdekatAdapter(
 
     override fun getItemCount() = min(wisataTerdekatList.size, 5)
 
+    fun setItems(newItems: List<WisataTerdekatItem>) {
+        wisataTerdekatList.clear()
+        wisataTerdekatList.addAll(newItems)
+        notifyDataSetChanged()
+    }
 
+    fun getItem(position: Int): WisataTerdekatItem {
+        return wisataTerdekatList[position]
+    }
 
 }

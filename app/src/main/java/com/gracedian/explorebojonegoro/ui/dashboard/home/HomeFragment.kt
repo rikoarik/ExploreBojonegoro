@@ -136,18 +136,22 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         }
 
         loadingProgressBar.visibility = View.VISIBLE
-        getUser()
-        checkPermission()
-        getDataWisataTerdekat()
-        getFavoriteItems()
+        CoroutineScope(Dispatchers.Main).launch {
+            getUser()
+            checkPermission()
+            getDataWisataTerdekat()
+            getFavoriteItems()
+        }
     }
 
     private fun refreshData() {
         loadingProgressBar.visibility = View.VISIBLE
-        checkPermission()
-        getUser()
-        getDataWisataTerdekat()
-        swipeRefreshLayout.isRefreshing = false
+        CoroutineScope(Dispatchers.Main).launch {
+            checkPermission()
+            getUser()
+            getDataWisataTerdekat()
+            swipeRefreshLayout.isRefreshing = false
+        }
     }
     private fun updateDateTime() {
         val currentTime = System.currentTimeMillis()
@@ -192,7 +196,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Request the missing permissions here
+
             return
         }
 
@@ -248,7 +252,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
     }
 
     private fun getWeatherData(latitude: Double, longitude: Double) {
-
         val weatherRetrofit = WeatherRetrofit()
         weatherRetrofit.getWeatherData(latitude, longitude) { weatherResponse ->
             if (weatherResponse != null) {

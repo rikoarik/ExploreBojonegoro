@@ -40,10 +40,10 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     private lateinit var searchRecyclerView: RecyclerView
     private lateinit var notFoundImageView: ImageView
 
-    private val searchItemsList =  mutableListOf<SearchItem>()
-    private val searchAdapter = SearchAdapter(searchItemsList, this)
+    val searchItemsList =  mutableListOf<SearchItem>()
+    var searchAdapter = SearchAdapter(searchItemsList, this)
 
-    private val databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("objekwisata")
+    var databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("objekwisata")
 
     private var appliedCategory: String = ""
     private var appliedRating: Float = 0.0f
@@ -181,7 +181,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
             }
         })
     }
-    private fun filterSearchResults(query: String) {
+    fun filterSearchResults(query: String) {
         val filteredItems = searchItemsList.filter { searchItem ->
             val isQueryMatch = isQueryMatch(searchItem, query)
             val isCategoryMatch = isCategoryMatch(searchItem)

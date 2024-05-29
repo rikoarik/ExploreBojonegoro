@@ -10,7 +10,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primary">#4568F9</color>
     <color name="hint">#8391A1</color>
-    <color name="navcolor">#F9F9F9F0</color>
+    <color name="navcolor">#F9CFDFFF</color>
     <color name="selected">#F36D72</color>
     <color name="textBlack">#333333</color>
 </resources>

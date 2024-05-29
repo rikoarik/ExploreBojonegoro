@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +29,9 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatIte
 import com.gracedian.explorebojonegoro.ui.dashboard.profile.adapter.HistoryTripsAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.profile.item.HistoryTrips
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClickListener {
 
@@ -38,6 +42,8 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
     private val wishlistItems = mutableListOf<HistoryTrips>()
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
+    private lateinit var editTextSearch: EditText
+    private val filteredHistoryTripsItems = mutableListOf<HistoryTrips>()
 
     private var date: String = ""
 
@@ -46,6 +52,8 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
         setContentView(R.layout.activity_history_trips)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         databaseReference = FirebaseDatabase.getInstance().reference
+
+        editTextSearch = findViewById(R.id.editTextSearch)
         recyclerView = findViewById(R.id.rcMyTrips)
         btBack = findViewById(R.id.btBack)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -55,8 +63,11 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
         btBack.setOnClickListener {
             finish()
         }
-        getLocation()
-        getDestinationsFromFirebase()
+        CoroutineScope(Dispatchers.Main).launch {
+            getLocation()
+            getDestinationsFromFirebase()
+        }
+
     }
     private fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
@@ -67,8 +78,6 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -83,6 +92,22 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
                 }
             }
     }
+
+    private fun filterWishlistItems(query: String) {
+        filteredHistoryTripsItems.clear()
+        if (query.isEmpty()) {
+            filteredHistoryTripsItems.addAll(wishlistItems)
+        } else {
+            for (item in wishlistItems) {
+                if (item.wisata?.contains(query, ignoreCase = true) == true ||
+                    item.alamat?.contains(query, ignoreCase = true) == true) {
+                    filteredHistoryTripsItems.add(item)
+                }
+            }
+        }
+        adapter.notifyDataSetChanged()
+    }
+
 
     private fun getDestinationsFromFirebase() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid

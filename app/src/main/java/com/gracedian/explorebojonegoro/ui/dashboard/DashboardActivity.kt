@@ -1,61 +1,66 @@
 package com.gracedian.explorebojonegoro.ui.dashboard
 
+import CustomPagerAdapter
 import android.os.Bundle
-import android.widget.FrameLayout
-import androidx.activity.enableEdgeToEdge
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.isEmpty
-import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.viewpager2.widget.ViewPager2
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.maps.MapsFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.MyTripsFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.profile.ProfileFragment
 import io.ak1.BubbleTabBar
-import io.ak1.OnBubbleClickListener
 
 class DashboardActivity : AppCompatActivity() {
 
     private lateinit var bottomBar: BubbleTabBar
-    private lateinit var fragmentContainer: FrameLayout
+    private lateinit var viewPager: ViewPager2
+    private lateinit var adapter: CustomPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         setContentView(R.layout.activity_dashboard)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+
         bottomBar = findViewById(R.id.bottomBar)
-        fragmentContainer = findViewById(R.id.fragmentContainer)
+        viewPager = findViewById(R.id.viewPager)
 
-        val fragment1 = HomeFragment()
-        val fragment2 = MapsFragment()
-        val fragment3 = MyTripsFragment()
-        val fragment4 = ProfileFragment()
-        if (fragmentContainer.isEmpty()){
-            replaceFragment(fragment1)
-        }
+        // Initialize adapter
+        adapter = CustomPagerAdapter(this)
 
+        // Add fragments to the adapter
+        adapter.addFragment(HomeFragment())
+        adapter.addFragment(MapsFragment())
+        adapter.addFragment(MyTripsFragment())
+        adapter.addFragment(ProfileFragment())
+
+        // Set adapter to ViewPager2
+        viewPager.adapter = adapter
+
+        // Set ViewPager2 page change listener
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                bottomBar.setSelected(position, false)
+            }
+        })
+
+        // Set bottom bar click listener
         bottomBar.addBubbleListener { id ->
             when (id) {
-                R.id.nav_home -> replaceFragment(fragment1)
-                R.id.nav_maps -> replaceFragment(fragment2)
-                R.id.nav_my_trips -> replaceFragment(fragment3)
-                R.id.nav_profile -> replaceFragment(fragment4)
+                R.id.nav_home -> viewPager.setCurrentItem(0, true)
+                R.id.nav_maps -> viewPager.setCurrentItem(1, true)
+                R.id.nav_my_trips -> viewPager.setCurrentItem(2, true)
+                R.id.nav_profile -> viewPager.setCurrentItem(3, true)
             }
         }
 
+        viewPager.isUserInputEnabled = false
     }
 
-    private fun replaceFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
-    }
+
 }
+
+

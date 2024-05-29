@@ -7,16 +7,20 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
@@ -26,6 +30,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
+import com.gracedian.explorebojonegoro.ui.dashboard.DashboardActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
@@ -40,9 +45,10 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HistoryTripsAdapter
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val wishlistItems = mutableListOf<HistoryTrips>()
+    private val historyTrips = mutableListOf<HistoryTrips>()
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
+
 
     private var date: String = ""
 
@@ -54,14 +60,19 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
         val view = inflater.inflate(R.layout.fragment_mytrips, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         databaseReference = FirebaseDatabase.getInstance().reference
+
         recyclerView = view.findViewById(R.id.rcMyTrips)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = HistoryTripsAdapter(wishlistItems, this)
+        adapter = HistoryTripsAdapter(historyTrips, this)
         recyclerView.adapter = adapter
         getLocation()
         getDestinationsFromFirebase()
 
+
         return view
+
+
+
     }
 
 
@@ -74,8 +85,6 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -156,7 +165,7 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
                             alamat = wisataTerdekatItem.alamat,
                             date = date
                         )
-                        wishlistItems.add(historyTrip)
+                        historyTrips.add(historyTrip)
 
                     }
                     recyclerView.adapter = adapter
@@ -175,11 +184,12 @@ class FragmentMytrips : Fragment(), HistoryTripsAdapter.OnItemClickListener {
     }
 
     override fun onItemTerdekatClick(position: Int) {
-        val terdekatItem = wishlistItems[position]
+        val terdekatItem = historyTrips[position]
         val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
         intent.putExtra("wisata", terdekatItem.wisata)
         startActivity(intent)
     }
+
 
 
 

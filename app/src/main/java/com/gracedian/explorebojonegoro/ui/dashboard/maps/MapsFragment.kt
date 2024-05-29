@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +32,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
+import com.gracedian.explorebojonegoro.ui.dashboard.DashboardActivity
+import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
@@ -45,6 +49,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
     private val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
+    private lateinit var handler: Handler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,7 +73,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
 
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        mMap.uiSettings.isMapToolbarEnabled = true
         mMap.uiSettings.isCompassEnabled = true
         mMap.isMyLocationEnabled = true
 
@@ -102,6 +106,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
         super.onPause()
         mapView.onPause()
     }
+
 
     override fun onDestroy() {
         super.onDestroy()
@@ -295,4 +300,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
+
 }

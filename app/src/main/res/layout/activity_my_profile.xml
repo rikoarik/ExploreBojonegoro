@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/Theme.Material3.Light.NoActionBar"
     tools:context=".ui.dashboard.profile.MyProfileActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -151,6 +152,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:editable="false"
+                android:paddingStart="10dp"
                 android:fontFamily="@font/inter"
                 android:hint="Jenis Kelamin"
                 android:inputType="text"

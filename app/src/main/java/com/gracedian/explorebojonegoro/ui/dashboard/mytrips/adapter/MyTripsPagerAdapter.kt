@@ -19,4 +19,5 @@ class MyTripsPagerAdapter(fragmentActivity: FragmentActivity) : FragmentStateAda
     override fun getItemCount(): Int {
         return 2
     }
+
 }

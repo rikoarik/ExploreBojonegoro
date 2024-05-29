@@ -6,11 +6,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -25,6 +28,13 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataA
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.max
 
 class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
@@ -35,10 +45,8 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private val wishlistItems = mutableListOf<WisataTerdekatItem>()
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
-
-
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
+    private val filteredWishlistItems = mutableListOf<WisataTerdekatItem>()
+    private val scope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,6 +54,7 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_wishlist, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
+
         recyclerView = view.findViewById(R.id.rcWishlist)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = WisataTerdekatAdapter(wishlistItems, this)
@@ -53,14 +62,18 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
 
         databaseReference = FirebaseDatabase.getInstance().getReference("favorites")
 
-
+        CoroutineScope(Dispatchers.Main).launch {
+            withContext(Dispatchers.IO) {
+                retrieveWishlistItems()
+                getFavoriteItems()
+            }
+        }
         return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getLocation()
-        retrieveWishlistItems()
 
     }
     private fun getLocation(){
@@ -72,8 +85,7 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
+
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -151,11 +163,8 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                     adapter.notifyDataSetChanged()
 
                 }
-                handler = Handler()
-                runnable = kotlinx.coroutines.Runnable { getFavoriteItems()}
-                handler.post(runnable)
-
-
+                startAutoRefresh()
+                adapter.notifyDataSetChanged()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -229,13 +238,13 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                                 if (isFavorite == true){
                                     imageView?.setImageResource(R.drawable.ic_favorite_true)
                                 }
-
+                                adapter.notifyItemChanged(position)
                                 break
                             }
 
                         }
                         adapter.notifyDataSetChanged()
-                        handler.postDelayed(runnable, 1000)
+
                     }
 
                 }
@@ -286,11 +295,25 @@ class FragmentWishlist : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+    private fun startAutoRefresh() {
+        scope.launch {
+            while (isActive) { // Lanjutkan autorefresh selama coroutine aktif
+                // Panggil fungsi yang ingin di-refresh
+                getFavoriteItems()
+
+                // Jeda selama 1 menit sebelum melakukan autorefresh lagi
+                delay(1000)
+            }
+        }
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        handler.removeCallbacks(runnable)
+        // Batalkan semua coroutine yang terkait dengan fragment saat onDestroyView dipanggil
+        scope.cancel()
     }
+
+
 
 
 

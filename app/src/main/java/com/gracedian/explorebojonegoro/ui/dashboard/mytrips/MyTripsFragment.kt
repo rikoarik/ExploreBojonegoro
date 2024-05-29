@@ -10,6 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.gracedian.explorebojonegoro.R
+import com.gracedian.explorebojonegoro.ui.dashboard.DashboardActivity
+import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.mytrips.adapter.MyTripsPagerAdapter
 
 class MyTripsFragment : Fragment() {
@@ -36,7 +38,10 @@ class MyTripsFragment : Fragment() {
             }
         }.attach()
 
-
         return view
     }
+
+
+
+
 }

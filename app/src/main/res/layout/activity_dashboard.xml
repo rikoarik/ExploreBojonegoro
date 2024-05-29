@@ -8,14 +8,14 @@
     android:id="@+id/main"
     tools:context=".ui.dashboard.DashboardActivity">
 
-  <FrameLayout
-      android:id="@+id/fragmentContainer"
+  <androidx.viewpager2.widget.ViewPager2
+      android:id="@+id/viewPager"
       android:layout_width="match_parent"
       android:layout_height="0dp"
-      app:layout_constraintBottom_toTopOf="@+id/bottomBar"
+      app:layout_constraintBottom_toTopOf="@id/bottomBar"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintTop_toTopOf="parent"/>
 
   <io.ak1.BubbleTabBar
       android:id="@+id/bottomBar"

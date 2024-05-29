@@ -78,7 +78,7 @@ class OnboardingActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateIllustration(position: Int) {
+    fun updateIllustration(position: Int) {
         val newImageResId = when (position) {
             0 -> R.drawable.ilustrasi1
             1 -> R.drawable.ilustrasi2

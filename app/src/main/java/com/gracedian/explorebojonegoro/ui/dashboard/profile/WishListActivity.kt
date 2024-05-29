@@ -7,7 +7,10 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -41,12 +44,16 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
     private val wishlistItems = mutableListOf<WisataTerdekatItem>()
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
+    private lateinit var editTextSearch: EditText
+    private val filteredWishlistItems = mutableListOf<WisataTerdekatItem>()
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_wish_list)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        editTextSearch = findViewById(R.id.editTextSearch)
         recyclerView = findViewById(R.id.rcWishlist)
         btBack = findViewById(R.id.btBack)
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -58,6 +65,15 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
         btBack.setOnClickListener {
             finish()
         }
+        editTextSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterWishlistItems(s.toString())
+            }
+            override fun afterTextChanged(s: Editable?) {
+
+            }
+        })
 
         getLocation()
         retrieveWishlistItems()
@@ -72,8 +88,6 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
             //                                          int[] grantResults)
@@ -109,7 +123,20 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
     }
 
 
-
+    private fun filterWishlistItems(query: String) {
+        filteredWishlistItems.clear()
+        if (query.isEmpty()) {
+            filteredWishlistItems.addAll(wishlistItems)
+        } else {
+            for (item in wishlistItems) {
+                if (item.wisata?.contains(query, ignoreCase = true) == true ||
+                    item.alamat?.contains(query, ignoreCase = true) == true) {
+                    filteredWishlistItems.add(item)
+                }
+            }
+        }
+        adapter.notifyDataSetChanged()
+    }
     private fun getDataWisataTerdekat(wisata: String) {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         val query = db.orderByChild("wisata").equalTo(wisata)
