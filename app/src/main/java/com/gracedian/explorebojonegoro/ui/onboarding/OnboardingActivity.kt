@@ -2,14 +2,20 @@ package com.gracedian.explorebojonegoro.ui.onboarding
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import android.window.OnBackInvokedCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.isVisible
@@ -19,6 +25,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.onboarding.adapter.OnboardingPagerAdapter
 import com.gracedian.explorebojonegoro.utils.permissionrequest.PermissionRequestsActivity
+
 
 class OnboardingActivity : AppCompatActivity() {
 
@@ -30,6 +37,7 @@ class OnboardingActivity : AppCompatActivity() {
     private lateinit var llFinish: LinearLayout
     private lateinit var btFinish: AppCompatButton
     private lateinit var imgIlustrasi: ImageView
+    private var doubleBackToExitPressedOnce = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,6 +55,7 @@ class OnboardingActivity : AppCompatActivity() {
 
         setupViews()
     }
+
 
     private fun setupViews() {
         val adapter = OnboardingPagerAdapter(this)
@@ -76,6 +85,25 @@ class OnboardingActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (doubleBackToExitPressedOnce) {
+                    finish()
+                    return
+                }
+
+                if (viewPager.currentItem > 0) {
+                    viewPager.setCurrentItem(viewPager.currentItem - 1, true)
+                } else {
+                    doubleBackToExitPressedOnce = true
+                    Toast.makeText(this@OnboardingActivity, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        doubleBackToExitPressedOnce = false
+                    }, 2000)
+                }
+            }
+        })
+
     }
 
     fun updateIllustration(position: Int) {
@@ -102,5 +130,6 @@ class OnboardingActivity : AppCompatActivity() {
             override fun onAnimationRepeat(animation: Animation?) {}
         })
     }
+
 
 }

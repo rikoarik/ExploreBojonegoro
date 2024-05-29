@@ -32,8 +32,11 @@ class FinishNavigateDialog(private val destinationType: String) : SuperBottomShe
                 "hotel" -> Intent(requireContext(), DetailsHotelActivity::class.java)
                 else -> null
             }
-            startActivity(intent)
-            requireActivity().finish()
+            if (intent != null) {
+                startActivity(intent)
+                requireActivity().finish()
+            }
+
         }
 
         return view

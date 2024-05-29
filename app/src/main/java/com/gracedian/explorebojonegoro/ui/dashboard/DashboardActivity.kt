@@ -1,11 +1,16 @@
 package com.gracedian.explorebojonegoro.ui.dashboard
 
-import CustomPagerAdapter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
@@ -18,49 +23,61 @@ class DashboardActivity : AppCompatActivity() {
 
     private lateinit var bottomBar: BubbleTabBar
     private lateinit var viewPager: ViewPager2
-    private lateinit var adapter: CustomPagerAdapter
+    private var selectedId: Int = 0
+    private var doubleBackToExitPressedOnce = false
+    private val backPressHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        enableEdgeToEdge()
         setContentView(R.layout.activity_dashboard)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         bottomBar = findViewById(R.id.bottomBar)
         viewPager = findViewById(R.id.viewPager)
+        viewPager.adapter = ViewPager2Adapter(this)
 
-        // Initialize adapter
-        adapter = CustomPagerAdapter(this)
-
-        // Add fragments to the adapter
-        adapter.addFragment(HomeFragment())
-        adapter.addFragment(MapsFragment())
-        adapter.addFragment(MyTripsFragment())
-        adapter.addFragment(ProfileFragment())
-
-        // Set adapter to ViewPager2
-        viewPager.adapter = adapter
-
-        // Set ViewPager2 page change listener
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
-                bottomBar.setSelected(position, false)
+                super.onPageSelected(position)
+                bottomBar.setSelected(position)
             }
         })
 
-        // Set bottom bar click listener
         bottomBar.addBubbleListener { id ->
+            selectedId = id
             when (id) {
-                R.id.nav_home -> viewPager.setCurrentItem(0, true)
-                R.id.nav_maps -> viewPager.setCurrentItem(1, true)
-                R.id.nav_my_trips -> viewPager.setCurrentItem(2, true)
-                R.id.nav_profile -> viewPager.setCurrentItem(3, true)
+                R.id.nav_home -> viewPager.currentItem = 0
+                R.id.nav_maps -> viewPager.currentItem = 1
+                R.id.nav_my_trips -> viewPager.currentItem = 2
+                R.id.nav_profile -> viewPager.currentItem = 3
             }
         }
-
         viewPager.isUserInputEnabled = false
+
+    }
+
+    override fun onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            super.onBackPressed()
+            finish()
+            return
+        }
+        if (viewPager.currentItem >= 1) {
+            viewPager.setCurrentItem(0, true)
+        } else if (viewPager.currentItem == 0) {
+            doubleBackToExitPressedOnce = true
+            Toast.makeText(this@DashboardActivity, "Please click BACK again to exit", Toast.LENGTH_SHORT).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                doubleBackToExitPressedOnce = false
+            }, 2000)
+        }
     }
 
 
 }
-
-

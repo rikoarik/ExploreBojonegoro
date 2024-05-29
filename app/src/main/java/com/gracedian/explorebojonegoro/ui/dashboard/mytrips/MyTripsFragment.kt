@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.viewpager.widget.ViewPager
 import androidx.viewpager2.widget.ViewPager2
@@ -37,7 +38,14 @@ class MyTripsFragment : Fragment() {
                 1 -> tab.text = "My Trips"
             }
         }.attach()
+        requireActivity().onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (viewPager.currentItem > 0) {
+                    viewPager.setCurrentItem(viewPager.currentItem - 1, true)
 
+                }
+            }
+        })
         return view
     }
 
