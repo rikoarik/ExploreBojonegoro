@@ -67,7 +67,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
         wisataTerdekatAdapter = WisataTerdekatAdapter(wisataTerdekatList, this)
         rcWisataMaps.adapter = wisataTerdekatAdapter
 
-
         return view
     }
 

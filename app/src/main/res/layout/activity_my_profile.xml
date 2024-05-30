@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.Material3.Light.NoActionBar"
+    android:theme="@style/Theme.ExploreBojonegoro.NoActionBar"
     tools:context=".ui.dashboard.profile.MyProfileActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout

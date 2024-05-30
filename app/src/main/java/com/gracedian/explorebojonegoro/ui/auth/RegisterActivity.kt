@@ -168,6 +168,7 @@ class RegisterActivity : AppCompatActivity() {
             .addOnCompleteListener { signInMethods ->
                 if (signInMethods.result?.signInMethods?.isNotEmpty() == true) {
                     inputEmailLayout.error = "Email is already registered"
+                    loadingBar.visibility = View.GONE
                 } else {
                     auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this) { task ->
@@ -190,6 +191,7 @@ class RegisterActivity : AppCompatActivity() {
                                 }
                             } else {
                                 Log.e("Register", "Gagal")
+                                loadingBar.visibility = View.GONE
                             }
                         }
                 }

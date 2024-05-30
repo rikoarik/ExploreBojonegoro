@@ -39,25 +39,25 @@
         <activity
             android:name=".ui.dashboard.profile.UpdatePasswordActivity"
             android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"/>
+            android:theme="@style/Theme.ExploreBojonegoro.NoActionBar"/>
         <activity
             android:name=".ui.dashboard.profile.MyProfileActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.ForgotPasswordActivity"
             android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"/>
+            android:theme="@style/Theme.ExploreBojonegoro.NoActionBar" />
         <activity
             android:name=".ui.dashboard.home.activity.SearchActivity"
             android:exported="false" />
         <activity
             android:name=".ui.auth.RegisterActivity"
             android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"/>
+            android:theme="@style/Theme.ExploreBojonegoro.NoActionBar"/>
         <activity
             android:name=".ui.auth.SignInActivity"
             android:exported="false"
-            android:theme="@style/Theme.Material3.Light.NoActionBar"/>
+            android:theme="@style/Theme.ExploreBojonegoro.NoActionBar"/>
         <activity
             android:name=".ui.welcome.WelcomeActivity"
             android:exported="false" />

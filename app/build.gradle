@@ -76,9 +76,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:20.3.1'
     implementation 'com.google.firebase:firebase-storage-ktx:20.3.0'
     implementation 'androidx.activity:activity:1.8.0'
-
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     implementation 'androidx.navigation:navigation-fragment:2.7.7'
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
@@ -104,17 +104,9 @@ dependencies {
     implementation  'io.ak1:bubbletabbar:1.0.8'
 
     implementation 'androidx.multidex:multidex:2.0.1'
-
-    // SDP layout size
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
-    // SSP Text sizes
-    implementation 'com.intuit.ssp:ssp-android:1.0.6'
-
-    // required to avoid crash on Android 12 API 31
     implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
-
-    /*mapbox*/
     implementation 'com.mapbox.maps:android:10.7.0'
     implementation 'com.mapbox.navigation:android:2.6.0'
 

@@ -440,7 +440,7 @@ class RouteNavigateActivity() : AppCompatActivity() {
         routeArrowView = MapboxRouteArrowView(routeArrowOptions)
 
         mapboxMap.loadStyleUri(
-            Style.MAPBOX_STREETS
+            Style.SATELLITE_STREETS
         ) {
 
             findRoute(Point.fromLngLat(longDestination, latDestination))
