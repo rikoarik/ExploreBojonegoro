@@ -117,7 +117,6 @@ class SignInActivity : AppCompatActivity() {
                         })
                         SharedPrefManager.setLoggedIn(this, true)
                         val intent = Intent(this, DashboardActivity::class.java)
-
                         startActivity(intent)
                         finish()
                     }

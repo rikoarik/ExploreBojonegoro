@@ -1,18 +1,19 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextClock
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
@@ -23,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.model.GlideUrl
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -31,7 +33,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import kotlin.math.*
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.item.User
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
@@ -43,54 +44,49 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.apiservice.WeatherRetro
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.PopularItem
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.max
 
-class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnItemClickListener{
+
+class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnItemClickListener {
 
     private val LOCATION_PERMISSION_REQUEST_CODE = 1001
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private lateinit var database: FirebaseDatabase
-    private lateinit var auth: FirebaseAuth
+    lateinit var database: FirebaseDatabase
+    lateinit var auth: FirebaseAuth
 
-    private lateinit var tgltxt: TextView
-    private lateinit var jamtxt: TextView
-    private lateinit var suhutxt: TextView
-    private lateinit var ketCuaca: TextView
+    lateinit var tgltxt: TextView
+    lateinit var jamtxt: TextClock
+    lateinit var suhutxt: TextView
+    lateinit var ketCuaca: TextView
     private lateinit var icCuaca: ImageView
     private lateinit var btSearch: ImageView
     private lateinit var locSaatIni: TextView
-    private lateinit var userNametxt: TextView
+    lateinit var userNametxt: TextView
     private lateinit var imgUserProfile: ImageView
     private lateinit var loadingProgressBar: ProgressBar
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
-
-    private lateinit var handler: Handler
-    private lateinit var runnable: Runnable
-
-    private lateinit var rcWisataTerdekat: RecyclerView
-    private lateinit var rcWisataPopular: RecyclerView
-    private lateinit var wisataTerdekatAdapter: WisataTerdekatAdapter
-    private lateinit var popularAdapter: PopularAdapter
+    lateinit var rcWisataTerdekat: RecyclerView
+    lateinit var rcWisataPopular: RecyclerView
+    lateinit var wisataTerdekatAdapter: WisataTerdekatAdapter
+    lateinit var popularAdapter: PopularAdapter
     private val wisataPopularList = mutableListOf<PopularItem>()
-    private val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
-    private var currentLocation: Location? = null
+    val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
+    var currentLocation: Location? = null
     private var averageRating = 0.0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         database = FirebaseDatabase.getInstance()
         auth = FirebaseAuth.getInstance()
@@ -109,12 +105,13 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
 
         rcWisataTerdekat = view.findViewById(R.id.rcWisataTerdekat)
         rcWisataPopular = view.findViewById(R.id.rcPopuler)
-        
+
         rcWisataTerdekat.layoutManager = LinearLayoutManager(requireContext())
         wisataTerdekatAdapter = WisataTerdekatAdapter(wisataTerdekatList, this)
         rcWisataTerdekat.adapter = wisataTerdekatAdapter
 
-        rcWisataPopular.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
+        rcWisataPopular.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         popularAdapter = PopularAdapter(wisataPopularList, this)
         rcWisataPopular.adapter = popularAdapter
 
@@ -122,9 +119,9 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             refreshData()
         }
 
-        handler = Handler()
-        runnable = Runnable { updateDateTime() }
-        handler.post(runnable)
+        CoroutineScope(Dispatchers.Main).launch {
+            updateDateTime()
+        }
 
         btSearch.setOnClickListener {
             val lat = currentLocation?.latitude
@@ -136,23 +133,25 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         }
 
         loadingProgressBar.visibility = View.VISIBLE
+        checkPermission()
         CoroutineScope(Dispatchers.Main).launch {
             getUser()
-            checkPermission()
             getDataWisataTerdekat()
             getFavoriteItems()
         }
+        return view
     }
 
     private fun refreshData() {
         loadingProgressBar.visibility = View.VISIBLE
+        checkPermission()
         CoroutineScope(Dispatchers.Main).launch {
-            checkPermission()
             getUser()
             getDataWisataTerdekat()
             swipeRefreshLayout.isRefreshing = false
         }
     }
+
     private fun updateDateTime() {
         val currentTime = System.currentTimeMillis()
         val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("id", "ID"))
@@ -162,15 +161,10 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         val timeText = timeFormat.format(currentTime)
         tgltxt.text = dateText
         jamtxt.text = timeText
-        handler.postDelayed(runnable, 1000)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        handler.removeCallbacks(runnable)
-    }
 
-    private fun checkPermission(){
+    private fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -186,6 +180,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             getLocation()
         }
     }
+
     private fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
@@ -251,6 +246,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun getWeatherData(latitude: Double, longitude: Double) {
         val weatherRetrofit = WeatherRetrofit()
         weatherRetrofit.getWeatherData(latitude, longitude) { weatherResponse ->
@@ -259,17 +255,13 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                 val weatherDescription = weatherResponse.weather[0].description
                 val iconId = weatherResponse.weather[0].icon
 
-
                 suhutxt.text = "${temperature.toInt()} °C"
                 ketCuaca.text = weatherDescription
 
-                val iconUrl = "https://openweathermap.org/img/wn/$iconId@4x.png"
-                Log.d("icon", iconId.toString())
-                Glide.with(this)
-                    .load(iconUrl)
-                    .into(icCuaca)
-                val suitableForVacation = weatherDescription?.let { isWeatherSuitableForVacation(it) }
-                if (suitableForVacation == true) {
+                getIcon(iconId)
+
+                val suitableForVacation = isWeatherSuitableForVacation(weatherDescription)
+                if (suitableForVacation) {
                     showToast("Cuaca sangat bagus untuk liburan!")
                 } else {
                     showToast("Cuaca mungkin tidak ideal untuk liburan.")
@@ -279,6 +271,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             }
         }
     }
+
     private fun isWeatherSuitableForVacation(description: String): Boolean {
         val suitableWeatherConditions = listOf(
             "clear sky",
@@ -291,6 +284,19 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             description.contains(condition, ignoreCase = true)
         }
     }
+    private fun getIcon(iconId: String){
+        val glideUrl = GlideUrl( "https://openweathermap.org/img/wn/$iconId@4x.png")
+        Glide.with(requireContext())
+            .load(glideUrl)
+            .apply(
+                RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .timeout(60000)
+            )
+            .into(icCuaca)
+
+    }
+
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
@@ -300,14 +306,19 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         Glide.with(requireContext())
             .load(imageURL)
             .placeholder(R.drawable.ic_user)
-            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+            .apply(RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(60000))
             .into(imgUserProfile)
     }
+
     private fun getDataWisataTerdekat() {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         db.addValueEventListener(object : ValueEventListener {
+            @SuppressLint("NotifyDataSetChanged")
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val previousFavorites = mutableMapOf<String, Boolean>() // Store previous favorite status
+                val previousFavorites =
+                    mutableMapOf<String, Boolean>()
                 for (item in wisataTerdekatList) {
                     previousFavorites[item.wisata ?: ""] = item.isFavorite
                 }
@@ -318,14 +329,19 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                         val wisata = childSnapshot.child("wisata").getValue(String::class.java)
                         val alamat = childSnapshot.child("alamat").getValue(String::class.java)
                         val latString = childSnapshot.child("latitude").getValue(String::class.java)
-                        val longString = childSnapshot.child("longitude").getValue(String::class.java)
+                        val longString =
+                            childSnapshot.child("longitude").getValue(String::class.java)
                         val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
 
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
 
-                        // Hitung jarak antara lokasi saat ini dan lokasi wisata
-                        val jarak = calculateVincentyDistance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, lat, long) / 1000
+                        val jarak = calculateVincentyDistance(
+                            currentLocation?.latitude ?: 0.0,
+                            currentLocation?.longitude ?: 0.0,
+                            lat,
+                            long
+                        ) / 1000
 
                         val intValue = jarak.toInt()
 
@@ -352,7 +368,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                     }
 
                     wisataTerdekatList.sortBy { it.jarak }
-                    wisataPopularList.sortByDescending { it.rating }
                     rcWisataPopular.adapter = popularAdapter
                     popularAdapter.notifyDataSetChanged()
                     rcWisataTerdekat.adapter = wisataTerdekatAdapter
@@ -368,8 +383,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             }
         })
     }
-
-
 
 
     override fun onItemTerdekatClick(position: Int) {
@@ -393,7 +406,9 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                 favoriteItem.wisata?.let {
                     favoritesRef.child(it).setValue(true)
                         .addOnSuccessListener {
-                            val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            val imageView =
+                                rcWisataTerdekat.layoutManager?.findViewByPosition(position)
+                                    ?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_true)
                             showToast("Wisata ditambahkan ke wishlist")
                         }
@@ -405,7 +420,9 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                 favoriteItem.wisata?.let {
                     favoritesRef.child(it).setValue(false)
                         .addOnSuccessListener {
-                            val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                            val imageView =
+                                rcWisataTerdekat.layoutManager?.findViewByPosition(position)
+                                    ?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_false)
                             showToast("Wisata dihapus dari wishlist")
                         }
@@ -416,8 +433,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             }
         }
     }
-
-
 
     override fun onItemPopularClick(position: Int) {
         val popularItem = wisataPopularList[position]
@@ -441,9 +456,11 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                             if (item.wisata == itemId) {
                                 item.isFavorite = isFavorite ?: false
                                 val position = wisataTerdekatList.indexOf(item)
-                                val imageView = rcWisataTerdekat.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+                                val imageView =
+                                    rcWisataTerdekat.layoutManager?.findViewByPosition(position)
+                                        ?.findViewById<ImageView>(R.id.btFavorite)
 
-                                if (isFavorite == true){
+                                if (isFavorite == true) {
                                     imageView?.setImageResource(R.drawable.ic_favorite_true)
                                 } else {
                                     imageView?.setImageResource(R.drawable.ic_favorite_false)
@@ -463,52 +480,52 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             })
         }
     }
+
     private fun setRatingTextByWisataName(wisata: String) {
         val databaseReference = FirebaseDatabase.getInstance().reference
-        databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                var totalRating = 0.0
-                var totalReviews = 0
-                if (snapshot.exists()) {
-                    for (ulasanSnapshot in snapshot.children) {
-                        val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
-                        rating?.let {
-                            totalRating += it
-                            totalReviews++
-                        } ?: run {
-                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
+        databaseReference.child("Ulasan").child(wisata)
+            .addValueEventListener(object : ValueEventListener {
+                @SuppressLint("NotifyDataSetChanged")
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    var totalRating = 0.0
+                    var totalReviews = 0
+                    if (snapshot.exists()) {
+                        for (ulasanSnapshot in snapshot.children) {
+                            val rating = ulasanSnapshot.child("rating").getValue(Double::class.java)
+                            rating?.let {
+                                totalRating += it
+                                totalReviews++
+                            } ?: run {
+                                Log.e(
+                                    "Rating",
+                                    "Null value found for rating in ulasan: ${ulasanSnapshot.key}"
+                                )
+                            }
                         }
-                    }
 
-                    totalReviews = max(totalReviews, 1)
+                        totalReviews = max(totalReviews, 1)
 
-                    val averageRating = totalRating / totalReviews
-                    for (item in wisataTerdekatList) {
-                        if (item.wisata == wisata) {
-                            item.rating = averageRating
+                        val averageRating = totalRating / totalReviews
+                        for (item in wisataTerdekatList) {
+                            if (item.wisata == wisata) {
+                                item.rating = averageRating
+                            }
                         }
-                    }
 
-                    wisataTerdekatAdapter.notifyDataSetChanged()
-                    for (item in wisataPopularList) {
-                        if (item.namaWisata == wisata) {
-                            item.rating = averageRating
-                            Log.e("ratingg", item.rating.toString())
+                        wisataTerdekatAdapter.notifyDataSetChanged()
+                        for (item in wisataPopularList) {
+                            if (item.namaWisata == wisata) {
+                                item.rating = averageRating
+                            }
                         }
+                        wisataPopularList.sortByDescending { it.rating }
+                        popularAdapter.notifyDataSetChanged()
                     }
-
-                    popularAdapter.notifyDataSetChanged()
-
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Log.e("Firebase", "Database error: ${error.message}")
-                // Handle error
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Database error: ${error.message}")
+                }
+            })
     }
-
-
-
 }

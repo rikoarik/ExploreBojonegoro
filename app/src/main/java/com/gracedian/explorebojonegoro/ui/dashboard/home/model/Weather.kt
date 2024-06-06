@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 data class Weather (
     @SerializedName("description")
     @Expose
-    var description: String? = null,
+    var description: String,
 
     @SerializedName("icon")
     @Expose
-    var icon: String? = null
+    var icon: String
 )

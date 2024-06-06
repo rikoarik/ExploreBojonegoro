@@ -1,8 +1,10 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.maps
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.os.Bundle
 import android.os.Handler
@@ -20,36 +22,43 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.MapView
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.gracedian.explorebojonegoro.R
-import com.gracedian.explorebojonegoro.ui.dashboard.DashboardActivity
-import com.gracedian.explorebojonegoro.ui.dashboard.home.HomeFragment
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import com.mapbox.android.core.permissions.PermissionsManager
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.LayerPosition
+import com.mapbox.maps.MapView
+import com.mapbox.maps.MapboxMap
+import com.mapbox.maps.Style
+import com.mapbox.maps.plugin.LocationPuck2D
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.locationcomponent.location2
 import kotlin.math.max
 
-class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnItemClickListener {
+class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
 
     private lateinit var mapView: MapView
-    private lateinit var mMap: GoogleMap
+    private lateinit var mapboxMap: MapboxMap
+    private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var rcWisataMaps: RecyclerView
     private lateinit var wisataTerdekatAdapter: WisataTerdekatAdapter
     private val wisataTerdekatList = mutableListOf<WisataTerdekatItem>()
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
-    private lateinit var handler: Handler
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,23 +67,31 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         mapView = view.findViewById(R.id.mapView)
-        mapView.onCreate(savedInstanceState)
-        mapView.getMapAsync(this)
+        mapView = view.findViewById(R.id.mapView)
+        mapboxMap = mapView.getMapboxMap()
+
+        mapboxMap.loadStyleUri(Style.LIGHT) {
+            // Style loaded, now you can add annotations or perform other map operations
+            pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
+            getDataWisataTerdekat()
+        }
+
+
+        mapView.location2.apply {
+            this.locationPuck = LocationPuck2D(
+                topImage = ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.ic_navigation_puck_icon
+                )
+            )
+            this.enabled = true
+        }
 
         rcWisataMaps = view.findViewById(R.id.rcWisataMaps)
 
         rcWisataMaps.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
         wisataTerdekatAdapter = WisataTerdekatAdapter(wisataTerdekatList, this)
         rcWisataMaps.adapter = wisataTerdekatAdapter
-
-        return view
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        mMap.uiSettings.isCompassEnabled = true
-        mMap.isMyLocationEnabled = true
-
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -84,7 +101,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                 .addOnSuccessListener { location: Location? ->
                     location?.let {
                         currentLocation = it
-                        getDataWisataTerdekat()
+                        val cameraOptions = CameraOptions.Builder()
+                            .center(Point.fromLngLat(it.longitude, it.latitude))
+                            .zoom(9.0)
+                            .build()
+                        mapboxMap.setCamera(cameraOptions)
+                        if (this::pointAnnotationManager.isInitialized) {
+                            getDataWisataTerdekat()
+                        }
                     }
                 }
         } else {
@@ -94,34 +118,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                 LOCATION_PERMISSION_REQUEST_CODE
             )
         }
-    }
 
-    override fun onResume() {
-        super.onResume()
-        mapView.onResume()
-    }
 
-    override fun onPause() {
-        super.onPause()
-        mapView.onPause()
+        return view
     }
 
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView.onDestroy()
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
-    }
     private fun getDataWisataTerdekat() {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         db.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    mMap.clear() // Clear existing markers
                     wisataTerdekatList.clear()
                     for (childSnapshot in dataSnapshot.children) {
                         val wisata = childSnapshot.child("wisata").getValue(String::class.java)
@@ -133,18 +141,18 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
 
-                        // Create LatLng object for the attraction
-                        val latLng = LatLng(lat, long)
+                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_pin)
 
-                        // Create marker options
-                        val markerOptions = MarkerOptions().position(latLng).title(wisata)
+                        val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(Point.fromLngLat(long, lat))
+                            .withIconImage(bitmap)
+                            .withIconSize(0.5)
+                            .withTextField(wisata!!)
+                            .withTextSize(12.0)
+                            .withTextColor("#92959D")
+                            .withTextOffset(listOf(0.0, -1.6))
 
-                        // Add marker to the map
-                        mMap.addMarker(markerOptions)
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
-
-                        // Hitung jarak antara lokasi saat ini dan lokasi wisata
+                        pointAnnotationManager.create(pointAnnotationOptions)
                         val jarak = calculateVincentyDistance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, lat, long) / 1000
 
                         val intValue = jarak.toInt()
@@ -159,9 +167,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                             long = long,
                         )
                         wisataTerdekatList.add(wisataTerdekatItem)
-                        if (wisata != null) {
-                            setRatingTextByWisataName(wisata)
-                        }
+                        setRatingTextByWisataName(wisata)
                     }
                     wisataTerdekatList.sortBy { it.jarak }
                     rcWisataMaps.adapter = wisataTerdekatAdapter
@@ -169,7 +175,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
                     wisataTerdekatAdapter.notifyDataSetChanged()
                 }
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.e("GetData", "Error: ${databaseError.message}")
             }
@@ -286,7 +291,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("Firebase", "Database error: ${error.message}")
-                // Handle error
             }
         })
     }
@@ -298,6 +302,29 @@ class MapsFragment : Fragment(), OnMapReadyCallback, WisataTerdekatAdapter.OnIte
     }
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+    @SuppressLint("Lifecycle")
+    override fun onStart() {
+        super.onStart()
+        mapView.onStart()
+    }
+
+    @SuppressLint("Lifecycle")
+    override fun onStop() {
+        super.onStop()
+        mapView.onStop()
+    }
+
+    @SuppressLint("Lifecycle")
+    override fun onLowMemory() {
+        super.onLowMemory()
+        mapView.onLowMemory()
+    }
+
+    @SuppressLint("Lifecycle")
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mapView.onDestroy()
     }
 
 

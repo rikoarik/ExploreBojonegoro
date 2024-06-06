@@ -116,13 +116,12 @@
                             android:fontFamily="@font/inter_semibold"
                             android:text="Tanggal: DD/MM/YYYY" />
 
-                        <TextView
+                        <TextClock
                             android:id="@+id/jamtxt"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textColor="@color/white"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="Jam: HH:mm:ss" />
+                            android:fontFamily="@font/inter_semibold" />
 
                     </LinearLayout>
                     <LinearLayout

@@ -34,12 +34,12 @@ class DashboardActivity : AppCompatActivity() {
         viewPager = findViewById(R.id.viewPager)
         viewPager.adapter = ViewPager2Adapter(this)
 
-        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                bottomBar.setSelected(position)
-            }
-        })
+            viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    bottomBar.setSelected(position)
+                }
+            })
 
         bottomBar.addBubbleListener { id ->
             selectedId = id
@@ -54,10 +54,11 @@ class DashboardActivity : AppCompatActivity() {
 
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed()
-            finish()
+            finishAffinity()
             return
         }
         if (viewPager.currentItem >= 1) {
@@ -70,6 +71,5 @@ class DashboardActivity : AppCompatActivity() {
             }, 2000)
         }
     }
-
 
 }

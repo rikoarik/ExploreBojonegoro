@@ -7,6 +7,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.PopularItem
 
@@ -37,6 +39,10 @@ class PopularAdapter(
 
         Glide.with(holder.itemView.context)
             .load(currentItem.imageUrl)
+            .apply(
+                RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(60000))
             .into(holder.imgWisata)
 
         holder.nameWisata.text = currentItem.namaWisata

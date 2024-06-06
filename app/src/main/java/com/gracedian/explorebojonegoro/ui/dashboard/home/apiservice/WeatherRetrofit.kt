@@ -1,6 +1,10 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.apiservice
 
+import android.provider.Settings.Global.getString
+import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.response.WeatherResponse
+import com.mapbox.maps.extension.style.expressions.dsl.generated.get
+import okhttp3.OkHttpClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -11,9 +15,11 @@ class WeatherRetrofit {
     private val BASE_URL = "https://api.openweathermap.org/"
     private val API_KEY = "06e906f4c3a0cdc425878da5f07e5e23"
 
+
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
+        .client(OkHttpClient.Builder().build())
         .build()
 
     private val apiService = retrofit.create(ApiService::class.java)

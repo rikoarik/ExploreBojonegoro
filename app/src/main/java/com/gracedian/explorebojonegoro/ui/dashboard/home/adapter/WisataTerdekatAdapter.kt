@@ -9,6 +9,8 @@ import android.widget.RatingBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import java.lang.Integer.min
@@ -44,6 +46,10 @@ class WisataTerdekatAdapter(
 
         Glide.with(holder.itemView.context)
             .load(currentItem.imageUrl)
+            .apply(
+                RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .timeout(60000))
             .into(holder.imgWisata)
 
         holder.namaWisata.text = currentItem.wisata

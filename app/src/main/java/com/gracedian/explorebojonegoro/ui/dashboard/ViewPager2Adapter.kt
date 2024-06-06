@@ -10,8 +10,6 @@ import com.gracedian.explorebojonegoro.ui.dashboard.profile.ProfileFragment
 
 class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
 
-    override fun getItemCount(): Int = 4
-
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> HomeFragment()
@@ -20,5 +18,8 @@ class ViewPager2Adapter(fragmentActivity: FragmentActivity) : FragmentStateAdapt
             3 -> ProfileFragment()
             else -> throw IllegalStateException("Invalid position: $position")
         }
+    }
+    override fun getItemCount(): Int {
+        return 4
     }
 }

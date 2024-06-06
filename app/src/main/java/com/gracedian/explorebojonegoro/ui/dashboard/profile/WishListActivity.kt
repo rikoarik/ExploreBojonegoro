@@ -6,28 +6,20 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.os.Handler
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.activity.DetailsWisataActivity
 import com.gracedian.explorebojonegoro.ui.dashboard.home.adapter.WisataTerdekatAdapter
@@ -57,7 +49,7 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
         recyclerView = findViewById(R.id.rcWishlist)
         btBack = findViewById(R.id.btBack)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = WisataTerdekatAdapter(wishlistItems, this)
+        adapter = WisataTerdekatAdapter(filteredWishlistItems, this)
         recyclerView.adapter = adapter
 
         databaseReference = FirebaseDatabase.getInstance().getReference("favorites")
@@ -65,34 +57,23 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
         btBack.setOnClickListener {
             finish()
         }
+
         editTextSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                filterWishlistItems(s.toString())
+                filterWishlistItems(s.toString().trim())
             }
-            override fun afterTextChanged(s: Editable?) {
-
-            }
+            override fun afterTextChanged(s: Editable?) {}
         })
 
         getLocation()
         retrieveWishlistItems()
-
     }
-    private fun getLocation(){
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
+
+    private fun getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION), 1)
             return
         }
         fusedLocationClient.lastLocation
@@ -122,21 +103,19 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
         }
     }
 
-
+    @SuppressLint("NotifyDataSetChanged")
     private fun filterWishlistItems(query: String) {
         filteredWishlistItems.clear()
         if (query.isEmpty()) {
             filteredWishlistItems.addAll(wishlistItems)
         } else {
-            for (item in wishlistItems) {
-                if (item.wisata?.contains(query, ignoreCase = true) == true ||
-                    item.alamat?.contains(query, ignoreCase = true) == true) {
-                    filteredWishlistItems.add(item)
-                }
-            }
+            filteredWishlistItems.addAll(wishlistItems.filter { item ->
+                item.wisata?.contains(query, ignoreCase = true) == true || item.alamat?.contains(query, ignoreCase = true) == true
+            })
         }
         adapter.notifyDataSetChanged()
     }
+
     private fun getDataWisataTerdekat(wisata: String) {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         val query = db.orderByChild("wisata").equalTo(wisata)
@@ -173,13 +152,9 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                         }
                     }
                     wishlistItems.sortBy { it.jarak }
-                    recyclerView.adapter = adapter
+                    filterWishlistItems(editTextSearch.text.toString().trim())
                     getFavoriteItems()
-                    adapter.notifyDataSetChanged()
-
                 }
-
-
 
             }
 
@@ -190,20 +165,18 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
     }
 
     override fun onItemTerdekatClick(position: Int) {
-        val terdekatItem = wishlistItems[position]
+        val terdekatItem = filteredWishlistItems[position]
         val intent = Intent(this, DetailsWisataActivity::class.java)
         intent.putExtra("wisata", terdekatItem.wisata)
         startActivity(intent)
     }
 
     override fun onFavoriteClick(position: Int) {
-        val favoriteItem = wishlistItems[position]
+        val favoriteItem = filteredWishlistItems[position]
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-        wishlistItems.clear()
 
         if (userId != null) {
             val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
-
             val newFavoriteStatus = !favoriteItem.isFavorite
 
             if (newFavoriteStatus) {
@@ -215,7 +188,7 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                             showToast("Wisata ditambahkan ke wishlist")
                         }
                         .addOnFailureListener { e ->
-                            showToast("Gagal untuk menambahkan wisata ke wihslist: ${e.message}")
+                            showToast("Gagal untuk menambahkan wisata ke wishlist: ${e.message}")
                         }
                 }
             } else {
@@ -230,11 +203,8 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                             showToast("Failed to remove item from favorites: ${e.message}")
                         }
                 }
-
             }
-
         }
-
     }
 
     private fun getFavoriteItems() {
@@ -249,22 +219,18 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                         for (item in wishlistItems) {
                             if (item.wisata == itemId) {
                                 item.isFavorite = isFavorite ?: false
-                                val position = wishlistItems.indexOf(item)
+                                val position = filteredWishlistItems.indexOf(item)
                                 val imageView = recyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-                                if (isFavorite == true){
+                                if (isFavorite == true) {
                                     imageView?.setImageResource(R.drawable.ic_favorite_true)
                                 }
 
                                 break
                             }
-
                         }
                         adapter.notifyDataSetChanged()
-
                     }
-
                 }
-
 
                 override fun onCancelled(error: DatabaseError) {
                     Log.e("getFavoriteItems", "Error: ${error.message}")
@@ -272,6 +238,7 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
             })
         }
     }
+
     private fun setRatingTextByWisataName(wisata: String) {
         val databaseReference = FirebaseDatabase.getInstance().reference
         databaseReference.child("Ulasan").child(wisata).addValueEventListener(object :
@@ -298,8 +265,6 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
                             item.rating = averageRating
                         }
                     }
-
-
                 }
             }
 
@@ -309,9 +274,8 @@ class WishListActivity : AppCompatActivity(), WisataTerdekatAdapter.OnItemClickL
             }
         })
     }
+
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
-
-
 }

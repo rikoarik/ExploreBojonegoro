@@ -6,9 +6,9 @@ import com.google.gson.annotations.SerializedName
 data class Main(
     @SerializedName("temp")
     @Expose
-    var temp: Double = 0.0,
+    var temp: Double,
 
     @SerializedName("humidity")
     @Expose
-    var humidity: Int = 0
+    var humidity: Int
 )

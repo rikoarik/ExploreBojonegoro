@@ -43,7 +43,7 @@ class TentangFragment : Fragment() {
     private fun getData() {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         val query = db.orderByChild("wisata").equalTo(namaWisata)
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (childSnapshot in dataSnapshot.children) {

@@ -1,10 +1,13 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.profile
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
 import android.widget.ImageView
@@ -39,7 +42,7 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: HistoryTripsAdapter
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private val wishlistItems = mutableListOf<HistoryTrips>()
+    private val historyItems = mutableListOf<HistoryTrips>()
     private var currentLocation: Location? = null
     private lateinit var databaseReference: DatabaseReference
     private lateinit var editTextSearch: EditText
@@ -57,12 +60,19 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
         recyclerView = findViewById(R.id.rcMyTrips)
         btBack = findViewById(R.id.btBack)
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = HistoryTripsAdapter(wishlistItems, this)
+        adapter = HistoryTripsAdapter(filteredHistoryTripsItems, this)
         recyclerView.adapter = adapter
 
         btBack.setOnClickListener {
             finish()
         }
+        editTextSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                filterWishlistItems(s.toString().trim())
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
         CoroutineScope(Dispatchers.Main).launch {
             getLocation()
             getDestinationsFromFirebase()
@@ -93,20 +103,19 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
             }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun filterWishlistItems(query: String) {
         filteredHistoryTripsItems.clear()
         if (query.isEmpty()) {
-            filteredHistoryTripsItems.addAll(wishlistItems)
+            filteredHistoryTripsItems.addAll(historyItems)
         } else {
-            for (item in wishlistItems) {
-                if (item.wisata?.contains(query, ignoreCase = true) == true ||
-                    item.alamat?.contains(query, ignoreCase = true) == true) {
-                    filteredHistoryTripsItems.add(item)
-                }
-            }
+            filteredHistoryTripsItems.addAll(historyItems.filter { item ->
+                item.wisata?.contains(query, ignoreCase = true) == true || item.alamat?.contains(query, ignoreCase = true) == true
+            })
         }
         adapter.notifyDataSetChanged()
     }
+
 
 
     private fun getDestinationsFromFirebase() {
@@ -174,11 +183,11 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
                             alamat = wisataTerdekatItem.alamat,
                             date = date
                         )
-                        wishlistItems.add(historyTrip)
+                        historyItems.add(historyTrip)
 
                     }
                     recyclerView.adapter = adapter
-
+                    filterWishlistItems(editTextSearch.text.toString().trim())
                     adapter.notifyDataSetChanged()
 
                 }
@@ -193,7 +202,7 @@ class HistoryTripsActivity : AppCompatActivity(), HistoryTripsAdapter.OnItemClic
     }
 
     override fun onItemTerdekatClick(position: Int) {
-        val terdekatItem = wishlistItems[position]
+        val terdekatItem = historyItems[position]
         val intent = Intent(this, DetailsWisataActivity::class.java)
         intent.putExtra("wisata", terdekatItem.wisata)
         startActivity(intent)

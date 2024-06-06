@@ -18,12 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
-import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.PolylineOptions
+
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
@@ -48,6 +43,9 @@ import com.mapbox.navigation.base.options.NavigationOptions
 import com.mapbox.navigation.base.route.RouterCallback
 import com.mapbox.navigation.base.route.RouterFailure
 import com.mapbox.navigation.base.route.RouterOrigin
+import com.mapbox.navigation.base.route.toDirectionsRoutes
+import com.mapbox.navigation.base.route.toNavigationRoute
+import com.mapbox.navigation.base.route.toNavigationRoutes
 import com.mapbox.navigation.base.trip.model.RouteProgressState
 import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.MapboxNavigationProvider
@@ -79,6 +77,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import com.mapbox.navigation.ui.maps.route.line.model.toNavigationRouteLines
 import com.mapbox.navigation.ui.tripprogress.api.MapboxTripProgressApi
 import com.mapbox.navigation.ui.tripprogress.model.DistanceRemainingFormatter
 import com.mapbox.navigation.ui.tripprogress.model.EstimatedTimeToArrivalFormatter
@@ -98,7 +97,7 @@ import java.util.Calendar
 import java.util.Locale
 
 
-class RouteNavigateActivity() : AppCompatActivity() {
+class RouteNavigateActivity : AppCompatActivity() {
 
     private companion object {
         private const val BUTTON_ANIMATION_DURATION = 1500L
@@ -238,12 +237,14 @@ class RouteNavigateActivity() : AppCompatActivity() {
 
 
     private val routesObserver = RoutesObserver { routeUpdateResult ->
-        if (routeUpdateResult.routes.isNotEmpty()) {
+        if (routeUpdateResult.navigationRoutes.toDirectionsRoutes().isNotEmpty()) {
             // generate route geometries asynchronously and render them
-            val routeLines = routeUpdateResult.routes.map { RouteLine(it, null) }
+            val routeLines = routeUpdateResult.navigationRoutes.toDirectionsRoutes()
+                .map { RouteLine(it, null) }
 
-            routeLineApi.setRoutes(
+            routeLineApi.setNavigationRouteLines(
                 routeLines
+                    .toNavigationRouteLines()
             ) { value ->
                 mapboxMap.getStyle()?.apply {
                     routeLineView.renderRouteDrawData(this, value)
@@ -251,7 +252,9 @@ class RouteNavigateActivity() : AppCompatActivity() {
             }
 
             // update the camera position to account for the new route
-            viewportDataSource.onRouteChanged(routeUpdateResult.routes.first())
+            viewportDataSource.onRouteChanged(
+                routeUpdateResult.navigationRoutes.toDirectionsRoutes().first().toNavigationRoute()
+            )
             viewportDataSource.evaluate()
         } else {
             val style = mapboxMap.getStyle()
@@ -440,7 +443,7 @@ class RouteNavigateActivity() : AppCompatActivity() {
         routeArrowView = MapboxRouteArrowView(routeArrowOptions)
 
         mapboxMap.loadStyleUri(
-            Style.SATELLITE_STREETS
+            Style.MAPBOX_STREETS
         ) {
 
             findRoute(Point.fromLngLat(longDestination, latDestination))
@@ -562,7 +565,7 @@ class RouteNavigateActivity() : AppCompatActivity() {
         )
     }
     private fun setRouteAndStartNavigation(routes: List<DirectionsRoute>) {
-        mapboxNavigation.setRoutes(routes)
+        mapboxNavigation.setNavigationRoutes(routes.toNavigationRoutes())
 
         startSimulation(routes.first())
 
@@ -575,7 +578,7 @@ class RouteNavigateActivity() : AppCompatActivity() {
     }
 
     private fun clearRouteAndStopNavigation() {
-        mapboxNavigation.setRoutes(listOf())
+        mapboxNavigation.setNavigationRoutes(listOf<DirectionsRoute>().toNavigationRoutes())
 
         mapboxReplayer.stop()
         soundButton.visibility = View.INVISIBLE
