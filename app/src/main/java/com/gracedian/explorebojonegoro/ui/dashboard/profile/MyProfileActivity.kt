@@ -117,11 +117,14 @@ class MyProfileActivity : AppCompatActivity() {
         val genderAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, genderOptions)
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         autoCompleteGender.setAdapter(genderAdapter)
-
+        autoCompleteGender.onItemClickListener = object : AdapterView.OnItemClickListener {
+            override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                autoCompleteGender.setSelection(position)
+            }
+        }
         autoCompleteGender.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 autoCompleteGender.setSelection(position)
-
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

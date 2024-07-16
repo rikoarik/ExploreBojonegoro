@@ -31,23 +31,23 @@ import kotlin.math.max
 
 class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
 
-    private lateinit var backButton: ImageView
+    lateinit var backButton: ImageView
     private lateinit var titleTextView: TextView
     private lateinit var searchLayout: LinearLayout
-    private lateinit var searchEditText: EditText
-    private lateinit var filterButton: ImageView
-    private lateinit var resultTextView: TextView
-    private lateinit var searchRecyclerView: RecyclerView
-    private lateinit var notFoundImageView: ImageView
+    lateinit var searchEditText: EditText
+    lateinit var filterButton: ImageView
+    lateinit var resultTextView: TextView
+    lateinit var searchRecyclerView: RecyclerView
+    lateinit var notFoundImageView: ImageView
 
     val searchItemsList =  mutableListOf<SearchItem>()
     var searchAdapter = SearchAdapter(searchItemsList, this)
 
     var databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("objekwisata")
 
-    private var appliedCategory: String = ""
-    private var appliedRating: Float = 0.0f
-    private var appliedJarakMax: Int = 0
+    var appliedCategory: String = ""
+    var appliedRating: Float = 0.0f
+    var appliedJarakMax: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +66,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
 
     }
 
-    private fun initializeViews() {
+    fun initializeViews() {
         backButton = findViewById(R.id.btBack)
         titleTextView = findViewById(R.id.textView6)
         searchLayout = findViewById(R.id.linearLayout6)
@@ -165,9 +165,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         if (isCategoryMatch(searchItem) && isRatingMatch(searchItem) && isJarakMaxMatch(searchItem)) {
                             searchItemsList.add(searchItem)
                         }
-                        if (title != null) {
-                            setRatingTextByWisataName(title)
-                        }
+                        setRatingTextByWisataName(title)
                     }
                     searchAdapter.notifyDataSetChanged()
                     getFavoriteItems()
@@ -194,14 +192,14 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
         updateFilteredItemsView(filteredItems)
     }
 
-    private fun isRatingMatch(searchItem: SearchItem): Boolean {
+    fun isRatingMatch(searchItem: SearchItem): Boolean {
         return appliedRating == 0.0f || (searchItem.rating ?: 0.0) >= appliedRating
     }
 
-    private fun isJarakMaxMatch(searchItem: SearchItem): Boolean {
+    fun isJarakMaxMatch(searchItem: SearchItem): Boolean {
         return appliedJarakMax == 0 || searchItem.jarak!! <= appliedJarakMax
     }
-    private fun isCategoryMatch(searchItem: SearchItem): Boolean {
+    fun isCategoryMatch(searchItem: SearchItem): Boolean {
         return appliedCategory == "" || searchItem.kategori == appliedCategory
     }
     private fun isQueryMatch(searchItem: SearchItem, query: String): Boolean {

@@ -44,6 +44,8 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.apiservice.WeatherRetro
 import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.PopularItem
 import com.gracedian.explorebojonegoro.ui.dashboard.home.items.WisataTerdekatItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
+import com.mapbox.api.directions.v5.DirectionsCriteria
+import com.mapbox.api.directions.v5.MapboxDirections
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -55,7 +57,7 @@ import kotlin.math.max
 
 class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnItemClickListener {
 
-    private val LOCATION_PERMISSION_REQUEST_CODE = 1001
+    val LOCATION_PERMISSION_REQUEST_CODE = 1001
     lateinit var fusedLocationClient: FusedLocationProviderClient
 
     lateinit var database: FirebaseDatabase
@@ -164,7 +166,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
     }
 
 
-    private fun checkPermission() {
+    fun checkPermission() {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -181,7 +183,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
         }
     }
 
-    private fun getLocation() {
+    fun getLocation() {
         if (ActivityCompat.checkSelfPermission(
                 this.requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -217,7 +219,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             }
     }
 
-    private fun getUser() {
+    fun getUser() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             val userRef = database.reference.child("users").child(userId)
@@ -247,7 +249,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
     }
 
     @SuppressLint("SetTextI18n")
-    private fun getWeatherData(latitude: Double, longitude: Double) {
+    fun getWeatherData(latitude: Double, longitude: Double) {
         val weatherRetrofit = WeatherRetrofit()
         weatherRetrofit.getWeatherData(latitude, longitude) { weatherResponse ->
             if (weatherResponse != null) {

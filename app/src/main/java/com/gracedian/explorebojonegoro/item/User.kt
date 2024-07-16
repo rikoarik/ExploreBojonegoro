@@ -6,5 +6,4 @@ data class User(
     val tlp: String? = "",
     val gender: String? = "",
     var profileImageUrl: String? = ""
-
 )

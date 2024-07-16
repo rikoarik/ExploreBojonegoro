@@ -62,9 +62,9 @@ class ForgotPasswordActivity : AppCompatActivity() {
         val alertDialog = AlertDialog.Builder(this)
         alertDialog.setMessage("Email pemulihan kata sandi telah dikirim.\nSilahkan cek email Anda")
             .setTitle("Pesan Pemulihan Kata Sandi")
-            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+            .setPositiveButton("OK") { _, _ ->
                 finish()
-            })
+            }
         val dialog = alertDialog.create()
         dialog.show()
 

@@ -23,13 +23,13 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.items.Ul
 
 class AddUlasanFragment : SuperBottomSheetFragment() {
 
-    private lateinit var namaWisata: TextView
-    private lateinit var locWisata: TextView
-    private lateinit var ratingBar: RatingBar
-    private lateinit var editTextTextMultiLine: EditText
-    private lateinit var btnApply: AppCompatButton
-    private lateinit var databaseReference: DatabaseReference
-    private lateinit var auth: FirebaseAuth
+    lateinit var namaWisata: TextView
+    lateinit var locWisata: TextView
+    lateinit var ratingBar: RatingBar
+    lateinit var editTextTextMultiLine: EditText
+    lateinit var btnApply: AppCompatButton
+    lateinit var databaseReference: DatabaseReference
+    lateinit var auth: FirebaseAuth
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

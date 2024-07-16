@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_18" default="true" project-jdk-name="18" project-jdk-type="JavaSDK">
@@ -12,5 +13,9 @@
         <option name="scale" value="0.264" />
       </ProjectState>
     </option>
+  </component>
+  <component name="ai.sapient.unit.plugin.settings.SapientConfigurationState">
+    <option name="autoComplete" value="true" />
+    <option name="skipVerifyGetterMethod" value="true" />
   </component>
 </project>
