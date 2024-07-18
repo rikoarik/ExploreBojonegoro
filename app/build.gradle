@@ -23,8 +23,6 @@ android {
 
     buildTypes {
         release {
-            shrinkResources = true
-            minifyEnabled = true
             resValue "string", "mapbox_access_token", project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
 
             proguardFiles(

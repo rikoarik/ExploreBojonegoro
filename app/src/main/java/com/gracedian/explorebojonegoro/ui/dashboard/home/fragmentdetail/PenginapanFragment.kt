@@ -36,6 +36,7 @@ class PenginapanFragment : Fragment() {
         hotelAdapter = HotelAdapter(hotelList) { hotel ->
             val intent = Intent(requireContext(), DetailsHotelActivity::class.java)
             intent.putExtra("nama_hotel", hotel.nama)
+            Log.d("nama_hotel", hotel.nama.toString())
             startActivity(intent)
         }
         rcPenginapan.adapter = hotelAdapter
@@ -72,9 +73,7 @@ class PenginapanFragment : Fragment() {
                             intValue
                         )
                         hotelList.add(hotelTerdekatItem)
-                        if (hotelName != null){
-                            setRatingTextByHotelName(hotelName)
-                        }
+                        setRatingTextByHotelName(hotelName)
 
                     }
                     hotelAdapter.notifyDataSetChanged()

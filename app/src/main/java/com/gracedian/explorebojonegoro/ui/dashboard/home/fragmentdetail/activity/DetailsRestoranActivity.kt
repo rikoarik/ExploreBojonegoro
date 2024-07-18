@@ -81,7 +81,7 @@ class DetailsRestoranActivity : AppCompatActivity() {
     }
     private fun fetchRestoranData() {
         val restoran = intent.getStringExtra("nama_restoran").toString()
-        val databaseReference = FirebaseDatabase.getInstance().reference.child("Restoran").orderByChild(restoran)
+        val databaseReference = FirebaseDatabase.getInstance().reference.child("Restoran").orderByChild("Restoran").equalTo(restoran)
         databaseReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()){

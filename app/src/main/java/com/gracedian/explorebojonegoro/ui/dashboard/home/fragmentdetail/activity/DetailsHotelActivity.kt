@@ -79,13 +79,15 @@ class DetailsHotelActivity : AppCompatActivity() {
         }
     }
     private fun fetchHotelData() {
-        val Hotel = intent.getStringExtra("nama_hotel").toString()
-        val databaseReference = FirebaseDatabase.getInstance().reference.child("Hotel").orderByChild(Hotel)
-        databaseReference.addValueEventListener(object : ValueEventListener {
+        val hotel = intent.getStringExtra("nama_hotel").toString()
+        Log.d("Hotel", hotel)
+        val database = FirebaseDatabase.getInstance()
+        val databaseReference = database.getReference("Hotel").orderByChild("Hotel").equalTo(hotel)
+        databaseReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()){
                     for (snapshot in dataSnapshot.children) {
-                        val HotelName = snapshot.child("Hotel").getValue(String::class.java) ?: ""
+                        val hotelName = snapshot.child("Hotel").getValue(String::class.java) ?: ""
                         val alamat = snapshot.child("alamat").getValue(String::class.java) ?: ""
                         val imageUrl = snapshot.child("imageUrl").getValue(String::class.java) ?: ""
                         val latitude = snapshot.child("latitude").getValue(String::class.java) ?: ""
@@ -93,13 +95,13 @@ class DetailsHotelActivity : AppCompatActivity() {
 
                         lat = latitude.toDouble()
                         long = longitude.toDouble()
-                        namaHotel.text = HotelName
+                        namaHotel.text = hotelName
                         locHotel.text = alamat
                         Glide.with(this@DetailsHotelActivity)
                             .load(imageUrl)
                             .into(imgHotel)
                         val bundle = Bundle().apply {
-                            putString("namaHotel", HotelName)
+                            putString("namaHotel", hotelName)
                             putString("alamat", alamat)
                             putDouble("latitude", lat)
                             putDouble("longitude", long)
@@ -112,7 +114,7 @@ class DetailsHotelActivity : AppCompatActivity() {
                             UlasanHotelFragment()
                         )
                         adapter.setFragmentList(fragmentList)
-                        setRatingTextByWisataName(Hotel)
+                        setRatingTextByWisataName(hotel)
 
                     }
                 }
