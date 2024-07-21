@@ -1,77 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_margin="5dp"
-    android:elevation="10dp"
-    android:padding="10dp"
-    android:background="@drawable/btn_rounded_white"
-    android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:elevation="10dp"
+        android:padding="10dp"
+        android:background="@drawable/btn_rounded_white"
+        android:orientation="vertical">
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/imgUser"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:elevation="10dp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/circle"
-            android:src="@drawable/ic_user"/>
-        <TextView
-            android:id="@+id/userNametxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:text="Bambang"
-            android:layout_marginStart="10dp"
-            android:layout_weight="1"
-            android:textSize="20sp"
-            android:fontFamily="@font/inter_semibold"/>
-        <TextView
-            android:id="@+id/textDateAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/grey"
-            android:text="1 bulan lalu"
-            android:textSize="16sp"
-            android:fontFamily="@font/inter"/>
-
-    </LinearLayout>
-    <TextView
-        android:id="@+id/txtUlasan"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/grey"
-        android:text="Wisata alam yang bagus untuk refresing"
-        android:textSize="16sp"
-        android:fontFamily="@font/inter"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_marginTop="10dp">
-        <RatingBar
-            android:id="@+id/ratingBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.RatingBar.Indicator"
-            android:numStars="5"
-            android:progressDrawable="@drawable/custom_rating_bar"
-            android:rating="5"/>
-        <TextView
-            android:id="@+id/ratingDouble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/grey"
-            android:layout_marginStart="5dp"
-            android:layout_marginBottom="5dp"
-            android:text="5.0"
-            android:textSize="18sp"
-            android:fontFamily="@font/inter"/>
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+        <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/imgUser"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:elevation="10dp"
+                android:scaleType="centerCrop"
+                android:background="@drawable/circle"
+                android:src="@drawable/ic_user"/>
+        <TextView
+                android:id="@+id/userNametxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/black"
+                android:text="Bambang"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:fontFamily="@font/inter_semibold"/>
+        <TextView
+                android:id="@+id/textDateAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey"
+                android:text="1 bulan lalu"
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"/>
+
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+        <TextView
+                android:id="@+id/txtUlasan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/grey"
+                android:text="Wisata alam yang bagus untuk refresing"
+                android:textSize="12sp"
+                android:fontFamily="@font/inter"/>
+        <TextView
+                android:id="@+id/textViewReadMore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Baca Selengkapnya"
+                android:fontFamily="@font/inter"
+                android:textSize="12sp"
+                android:textColor="@android:color/holo_blue_dark"
+                android:visibility="visible" />
+
+        <TextView
+                android:id="@+id/textViewReadLess"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tampilkan Lebih Sedikit"
+                android:fontFamily="@font/inter"
+                android:textSize="12sp"
+                android:textColor="@android:color/holo_blue_dark"
+                android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+        <RatingBar
+                android:id="@+id/ratingBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.RatingBar.Indicator"
+                android:numStars="5"
+                android:progressDrawable="@drawable/custom_rating_bar"
+                android:rating="5"/>
+        <TextView
+                android:id="@+id/ratingDouble"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/grey"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
+                android:text="5.0"
+                android:textSize="18sp"
+                android:fontFamily="@font/inter"/>
     </LinearLayout>
 
 </LinearLayout>

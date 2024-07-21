@@ -1,5 +1,6 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.adapter
 
+import android.animation.ObjectAnimator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,8 @@ class UlasanAdapter(private val ulasanList: List<UlasanItems>) :
         val txtUlasan: TextView = itemView.findViewById(R.id.txtUlasan)
         val ratingBar: RatingBar = itemView.findViewById(R.id.ratingBar)
         val ratingDouble: TextView = itemView.findViewById(R.id.ratingDouble)
+        val textViewReadMore: TextView = itemView.findViewById(R.id.textViewReadMore)
+        val textViewReadLess: TextView = itemView.findViewById(R.id.textViewReadLess)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UlasanViewHolder {
@@ -42,9 +45,41 @@ class UlasanAdapter(private val ulasanList: List<UlasanItems>) :
         holder.txtUlasan.text = currentUlasan.ulasan
         holder.ratingBar.rating = currentUlasan.rating!!.toFloat()
         holder.ratingDouble.text = currentUlasan.rating.toString()
+        holder.textViewReadMore.setOnClickListener {
+            expandTextView(holder.txtUlasan)
+            holder.textViewReadMore.visibility = View.GONE
+            holder.textViewReadLess.visibility = View.VISIBLE
+        }
+
+        holder.textViewReadLess.setOnClickListener {
+            collapseTextView(holder.txtUlasan, 2)
+            holder.textViewReadLess.visibility = View.GONE
+            holder.textViewReadMore.visibility = View.VISIBLE
+        }
     }
 
     override fun getItemCount(): Int {
         return ulasanList.size
+    }
+    private fun expandTextView(textView: TextView) {
+        val initialHeight = textView.height
+        textView.maxLines = Int.MAX_VALUE
+        textView.measure(View.MeasureSpec.makeMeasureSpec(textView.width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        val targetHeight = textView.measuredHeight
+
+        val animator = ObjectAnimator.ofInt(textView, "height", initialHeight, targetHeight)
+        animator.duration = 300
+        animator.start()
+    }
+
+    private fun collapseTextView(textView: TextView, maxLines: Int) {
+        val initialHeight = textView.height
+        textView.maxLines = maxLines
+        textView.measure(View.MeasureSpec.makeMeasureSpec(textView.width, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED))
+        val targetHeight = textView.measuredHeight
+
+        val animator = ObjectAnimator.ofInt(textView, "height", initialHeight, targetHeight)
+        animator.duration = 300
+        animator.start()
     }
 }

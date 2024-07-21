@@ -3,6 +3,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="apikey">AIzaSyBm0_zF8oxKKcUiZY__ASnm6J7xb9fD6pk</string>
+    <string name="weather_api_key">06e906f4c3a0cdc425878da5f07e5e23</string>
     <style name="MyCustomTextAppearance" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
         <item name="android:textAllCaps">false</item>

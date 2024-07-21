@@ -99,9 +99,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                 val query = s.toString().trim()
                 filterSearchResults(query)
                 if (query.isEmpty()){
-                    notFoundImageView.visibility = View.GONE
                     getData()
-
                 }
             }
         })
@@ -169,7 +167,14 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                     }
                     searchAdapter.notifyDataSetChanged()
                     getFavoriteItems()
-                    resultTextView.text = "${searchItemsList.size} hasil ditemukan"
+
+                    if (searchItemsList.isEmpty()) {
+                        notFoundImageView.visibility = View.VISIBLE
+                        resultTextView.text = "Maaf, Tidak Dapat Menemukan Hasil Pencarian Anda"
+                    } else {
+                        notFoundImageView.visibility = View.GONE
+                        resultTextView.text = "${searchItemsList.size} hasil ditemukan"
+                    }
 
                 }
             }

@@ -24,7 +24,6 @@ android {
     buildTypes {
         release {
             resValue "string", "mapbox_access_token", project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
-            resValue "string", "weather_api_key", project.findProperty("WEATHER_API_KEY") ?: ""
             proguardFiles(
                     getDefaultProguardFile("proguard-android-optimize.txt"),
                     "proguard-rules.pro"
@@ -33,7 +32,6 @@ android {
         }
         debug {
             resValue "string", "mapbox_access_token", project.findProperty("MAPBOX_DOWNLOADS_TOKEN") ?: ""
-            resValue "string", "weather_api_key", project.findProperty("WEATHER_API_KEY") ?: ""
         }
 
     }

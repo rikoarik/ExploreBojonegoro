@@ -13,8 +13,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherRetrofit {
     private val BASE_URL = "https://api.openweathermap.org/"
-    private val API_KEY = R.string.weather_api_key
-
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -25,7 +23,7 @@ class WeatherRetrofit {
     private val apiService = retrofit.create(ApiService::class.java)
 
     fun getWeatherData(latitude: Double, longitude: Double, callback: (WeatherResponse?) -> Unit) {
-        val call = apiService.getWeather(latitude, longitude, API_KEY.toString(), "metric")
+        val call = apiService.getWeather(latitude, longitude, R.string.weather_api_key.toString(), "metric")
         call.enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 if (response.isSuccessful) {
