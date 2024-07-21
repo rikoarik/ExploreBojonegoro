@@ -52,7 +52,7 @@ class UlasanAdapter(private val ulasanList: List<UlasanItems>) :
         }
 
         holder.textViewReadLess.setOnClickListener {
-            collapseTextView(holder.txtUlasan, 2)
+            collapseTextView(holder.txtUlasan, 1)
             holder.textViewReadLess.visibility = View.GONE
             holder.textViewReadMore.visibility = View.VISIBLE
         }

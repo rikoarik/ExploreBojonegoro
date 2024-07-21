@@ -113,7 +113,7 @@ class RouteNavigateActivity : AppCompatActivity() {
     private lateinit var recenterButton: MapboxRecenterButton
     private lateinit var stopButton: ImageView
     private lateinit var tripProgressCard: CardView
-
+    private var isDestinationSaved = false
 
     private var latOrigin: Double = 0.0
     private var longOrigin: Double = 0.0
@@ -299,12 +299,14 @@ class RouteNavigateActivity : AppCompatActivity() {
         tripProgressView.render(
             tripProgressApi.getTripProgress(routeProgress)
         )
-        if (routeProgress.currentState == RouteProgressState.COMPLETE) {
+
+        if (routeProgress.currentState == RouteProgressState.COMPLETE && !isDestinationSaved) {
             val userId = getUserId()
             val namaWisata = intent.getStringExtra("namaWisata")
             val type = intent.getStringExtra("type")
             if (userId != null && namaWisata != null && type != null) {
                 saveDestinationInfoToFirebase(userId, namaWisata, type)
+                isDestinationSaved = true
             }
         }
     }
