@@ -18,7 +18,6 @@ import com.gracedian.explorebojonegoro.R
 class TentangHotelFragment : Fragment() {
 
     private lateinit var descTxt: TextView
-    private lateinit var btFavorite: ImageButton
     private lateinit var listLainLain: TextView
     private lateinit var fasilitas: TextView
     private lateinit var namaHotel: String

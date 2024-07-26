@@ -88,7 +88,6 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         }
 
         rcWisataMaps = view.findViewById(R.id.rcWisataMaps)
-
         rcWisataMaps.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
         wisataTerdekatAdapter = WisataTerdekatAdapter(wisataTerdekatList, this)
         rcWisataMaps.adapter = wisataTerdekatAdapter
@@ -170,6 +169,7 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         setRatingTextByWisataName(wisata)
                     }
                     wisataTerdekatList.sortBy { it.jarak }
+                    wisataTerdekatList.take(5)
                     rcWisataMaps.adapter = wisataTerdekatAdapter
                     getFavoriteItems()
                     wisataTerdekatAdapter.notifyDataSetChanged()
