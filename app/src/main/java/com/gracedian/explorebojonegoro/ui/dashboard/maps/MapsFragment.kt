@@ -60,6 +60,10 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
 
+
+    private val latList = mutableListOf<Double>()
+    private val longList = mutableListOf<Double>()
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -122,14 +126,18 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         return view
     }
 
-
-
     private fun getDataWisataTerdekat() {
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
         db.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
                     wisataTerdekatList.clear()
+                    val currentLat = currentLocation?.latitude ?: 0.0
+                    val currentLong = currentLocation?.longitude ?: 0.0
+
+                    // Temporary list to hold all the wisata items with calculated distance
+                    val allWisataItems = mutableListOf<WisataTerdekatItem>()
+
                     for (childSnapshot in dataSnapshot.children) {
                         val wisata = childSnapshot.child("wisata").getValue(String::class.java)
                         val alamat = childSnapshot.child("alamat").getValue(String::class.java)
@@ -140,20 +148,7 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         val lat = latString?.toDoubleOrNull() ?: 0.0
                         val long = longString?.toDoubleOrNull() ?: 0.0
 
-                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_pin)
-
-                        val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
-                            .withPoint(Point.fromLngLat(long, lat))
-                            .withIconImage(bitmap)
-                            .withIconSize(0.5)
-                            .withTextField(wisata!!)
-                            .withTextSize(12.0)
-                            .withTextColor("#92959D")
-                            .withTextOffset(listOf(0.0, -1.6))
-
-                        pointAnnotationManager.create(pointAnnotationOptions)
-                        val jarak = calculateVincentyDistance(currentLocation?.latitude ?: 0.0, currentLocation?.longitude ?: 0.0, lat, long) / 1000
-
+                        val jarak = calculateVincentyDistance(currentLat, currentLong, lat, long) / 1000
                         val intValue = jarak.toInt()
 
                         val wisataTerdekatItem = WisataTerdekatItem(
@@ -165,21 +160,52 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                             lat = lat,
                             long = long,
                         )
-                        wisataTerdekatList.add(wisataTerdekatItem)
-                        setRatingTextByWisataName(wisata)
+
+                        allWisataItems.add(wisataTerdekatItem)
                     }
-                    wisataTerdekatList.sortBy { it.jarak }
-                    wisataTerdekatList.take(5)
-                    rcWisataMaps.adapter = wisataTerdekatAdapter
-                    getFavoriteItems()
+
+                    // Sort all items by distance
+                    allWisataItems.sortBy { it.jarak }
+
+                    // Add only the closest items up to the maximum number
+                    val maxPoints = 10
+                    val closestWisataItems = allWisataItems.take(maxPoints)
+
+                    for (item in closestWisataItems) {
+                        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_pin)
+
+                        val pointAnnotationOptions: PointAnnotationOptions = PointAnnotationOptions()
+                            .withPoint(Point.fromLngLat(item.long!!, item.lat!!))
+                            .withIconImage(bitmap)
+                            .withIconSize(0.5)
+                            .withTextField(item.wisata!!)
+                            .withTextSize(12.0)
+                            .withTextColor("#92959D")
+                            .withTextOffset(listOf(0.0, -1.6))
+
+                        pointAnnotationManager.create(pointAnnotationOptions)
+                    }
+
+                    wisataTerdekatList.addAll(closestWisataItems)
                     wisataTerdekatAdapter.notifyDataSetChanged()
+
+                    getFavoriteItems()
+                    updateRatings()
                 }
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
                 Log.e("GetData", "Error: ${databaseError.message}")
             }
         })
     }
+
+    private fun updateRatings() {
+        for (item in wisataTerdekatList) {
+            setRatingTextByWisataName(item.wisata!!)
+        }
+    }
+
     override fun onItemTerdekatClick(position: Int) {
         val terdekatItem = wisataTerdekatList[position]
         val intent = Intent(requireActivity(), DetailsWisataActivity::class.java)
