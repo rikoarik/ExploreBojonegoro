@@ -61,9 +61,6 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private var currentLocation: Location? = null
 
 
-    private val latList = mutableListOf<Double>()
-    private val longList = mutableListOf<Double>()
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -75,11 +72,10 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         mapboxMap = mapView.getMapboxMap()
 
         mapboxMap.loadStyleUri(Style.LIGHT) {
-            // Style loaded, now you can add annotations or perform other map operations
+
             pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
             getDataWisataTerdekat()
         }
-
 
         mapView.location2.apply {
             this.locationPuck = LocationPuck2D(
@@ -135,7 +131,6 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                     val currentLat = currentLocation?.latitude ?: 0.0
                     val currentLong = currentLocation?.longitude ?: 0.0
 
-                    // Temporary list to hold all the wisata items with calculated distance
                     val allWisataItems = mutableListOf<WisataTerdekatItem>()
 
                     for (childSnapshot in dataSnapshot.children) {
@@ -164,10 +159,8 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         allWisataItems.add(wisataTerdekatItem)
                     }
 
-                    // Sort all items by distance
                     allWisataItems.sortBy { it.jarak }
 
-                    // Add only the closest items up to the maximum number
                     val maxPoints = 10
                     val closestWisataItems = allWisataItems.take(maxPoints)
 
@@ -320,8 +313,6 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
             }
         })
     }
-
-
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1001

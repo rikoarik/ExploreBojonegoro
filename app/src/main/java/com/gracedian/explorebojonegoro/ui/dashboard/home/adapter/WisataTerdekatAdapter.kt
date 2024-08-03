@@ -66,16 +66,6 @@ class WisataTerdekatAdapter(
         }
     }
 
-    override fun getItemCount() = min(wisataTerdekatList.size, 5)
-
-    fun setItems(newItems: List<WisataTerdekatItem>) {
-        wisataTerdekatList.clear()
-        wisataTerdekatList.addAll(newItems)
-        notifyDataSetChanged()
-    }
-
-    fun getItem(position: Int): WisataTerdekatItem {
-        return wisataTerdekatList[position]
-    }
+    override fun getItemCount() = wisataTerdekatList.size
 
 }

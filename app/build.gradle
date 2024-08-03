@@ -3,6 +3,18 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id "org.sonarqube" version "5.0.0.4638"
+}
+sonarqube{
+    properties {
+        property "sonar.projectKey", "Explore-Bojonegoro"
+        property "sonar.projectName", "Explore Bojonegoro"
+        property("sonar.sources", "src/main")
+        property("sonar.projectVersion", "1")
+        property "sonar.tests", "src/test"
+        property "sonar.token", "sqp_1cdc4f9bf8383db3940187983fe1d16d6e3a1e4b"
+        property "sonar.androidLint.reportPaths", "build/reports/lint-results.xml"
+    }
 }
 
 android {

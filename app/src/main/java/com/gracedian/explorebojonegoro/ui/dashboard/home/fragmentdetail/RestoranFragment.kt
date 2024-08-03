@@ -74,6 +74,7 @@ class RestoranFragment : Fragment() {
                         restoranList.add(restoranTerdekatItem)
                         setRatingTextByRestoranName(restoranName)
                     }
+                    restoranList.sortBy { it.jarak }
                     restoranAdapter.notifyDataSetChanged()
                 }
 

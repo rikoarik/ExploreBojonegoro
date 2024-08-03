@@ -1,7 +1,5 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.apiservice
 
-import android.provider.Settings.Global.getString
-import com.gracedian.explorebojonegoro.R
 import com.gracedian.explorebojonegoro.ui.dashboard.home.response.WeatherResponse
 import com.mapbox.maps.extension.style.expressions.dsl.generated.get
 import okhttp3.OkHttpClient
@@ -13,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class WeatherRetrofit {
     private val BASE_URL = "https://api.openweathermap.org/"
+    private val apikey = "06e906f4c3a0cdc425878da5f07e5e23"
 
     private val retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
@@ -23,7 +22,7 @@ class WeatherRetrofit {
     private val apiService = retrofit.create(ApiService::class.java)
 
     fun getWeatherData(latitude: Double, longitude: Double, callback: (WeatherResponse?) -> Unit) {
-        val call = apiService.getWeather(latitude, longitude, R.string.weather_api_key.toString(), "metric")
+        val call = apiService.getWeather(latitude, longitude, apikey, "metric")
         call.enqueue(object : Callback<WeatherResponse> {
             override fun onResponse(call: Call<WeatherResponse>, response: Response<WeatherResponse>) {
                 if (response.isSuccessful) {

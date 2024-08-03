@@ -54,5 +54,5 @@ class PopularAdapter(
         }
     }
 
-    override fun getItemCount() = Integer.min(popularItems.size, 5)
+    override fun getItemCount() = popularItems.size
 }

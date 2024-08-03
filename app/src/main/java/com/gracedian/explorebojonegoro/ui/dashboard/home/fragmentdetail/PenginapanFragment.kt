@@ -76,6 +76,7 @@ class PenginapanFragment : Fragment() {
                         setRatingTextByHotelName(hotelName)
 
                     }
+                    hotelList.sortBy { it.jarak }
                     hotelAdapter.notifyDataSetChanged()
                 }
 
