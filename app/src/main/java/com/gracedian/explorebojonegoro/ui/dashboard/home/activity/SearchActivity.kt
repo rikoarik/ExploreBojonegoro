@@ -29,7 +29,7 @@ import com.gracedian.explorebojonegoro.ui.dashboard.home.items.SearchItem
 import com.gracedian.explorebojonegoro.utils.distancecalculate.calculateVincentyDistance
 import kotlin.math.max
 
-class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
+class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener {
 
     lateinit var backButton: ImageView
     private lateinit var titleTextView: TextView
@@ -40,7 +40,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
     lateinit var searchRecyclerView: RecyclerView
     lateinit var notFoundImageView: ImageView
 
-    val searchItemsList =  mutableListOf<SearchItem>()
+    val searchItemsList = mutableListOf<SearchItem>()
     var searchAdapter = SearchAdapter(searchItemsList, this)
 
     var databaseReference: DatabaseReference = FirebaseDatabase.getInstance().getReference("objekwisata")
@@ -63,7 +63,6 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
         searchRecyclerView.layoutManager = LinearLayoutManager(this)
         searchRecyclerView.adapter = searchAdapter
         getData()
-
     }
 
     fun initializeViews() {
@@ -98,7 +97,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString().trim()
                 filterSearchResults(query)
-                if (query.isEmpty()){
+                if (query.isEmpty()) {
                     getData()
                 }
             }
@@ -135,6 +134,7 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                 }
                 if (dataSnapshot.exists()) {
                     searchItemsList.clear()
+                    val dataItems = mutableListOf<SearchItem>()
                     for (childSnapshot in dataSnapshot.children) {
                         val imageUrl = childSnapshot.child("imageUrl").getValue(String::class.java)
                         val title = childSnapshot.child("wisata").getValue(String::class.java) ?: ""
@@ -160,11 +160,33 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                             rating = 0.0,
                             jarak = intValue
                         )
-                        if (isCategoryMatch(searchItem) && isRatingMatch(searchItem) && isJarakMaxMatch(searchItem)) {
-                            searchItemsList.add(searchItem)
-                        }
-                        setRatingTextByWisataName(title)
+                        dataItems.add(searchItem)
                     }
+                    updateSearchItemsWithRating(dataItems)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("GetData", "Error: ${databaseError.message}")
+            }
+        })
+    }
+
+    private fun updateSearchItemsWithRating(dataItems: List<SearchItem>) {
+        val updatedItems = mutableListOf<SearchItem>()
+        val totalItems = dataItems.size
+        var processedItems = 0
+
+        dataItems.forEach { item ->
+            setRatingTextByWisataName(item.wisata ?: "") { averageRating ->
+                item.rating = averageRating
+                if (isCategoryMatch(item) && isRatingMatch(item) && isJarakMaxMatch(item)) {
+                    updatedItems.add(item)
+                }
+                processedItems++
+                if (processedItems == totalItems) {
+                    searchItemsList.clear()
+                    searchItemsList.addAll(updatedItems)
                     searchAdapter.notifyDataSetChanged()
                     getFavoriteItems()
 
@@ -175,16 +197,12 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         notFoundImageView.visibility = View.GONE
                         resultTextView.text = "${searchItemsList.size} hasil ditemukan"
                     }
-
                 }
             }
-
-            override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("GetData", "Error: ${databaseError.message}")
-            }
-        })
+        }
     }
-    fun filterSearchResults(query: String) {
+
+    private fun filterSearchResults(query: String) {
         val filteredItems = searchItemsList.filter { searchItem ->
             val isQueryMatch = isQueryMatch(searchItem, query)
             val isCategoryMatch = isCategoryMatch(searchItem)
@@ -197,16 +215,18 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
         updateFilteredItemsView(filteredItems)
     }
 
-    fun isRatingMatch(searchItem: SearchItem): Boolean {
+    private fun isRatingMatch(searchItem: SearchItem): Boolean {
         return appliedRating == 0.0f || (searchItem.rating ?: 0.0) >= appliedRating
     }
 
-    fun isJarakMaxMatch(searchItem: SearchItem): Boolean {
+    private fun isJarakMaxMatch(searchItem: SearchItem): Boolean {
         return appliedJarakMax == 0 || searchItem.jarak!! <= appliedJarakMax
     }
-    fun isCategoryMatch(searchItem: SearchItem): Boolean {
+
+    private fun isCategoryMatch(searchItem: SearchItem): Boolean {
         return appliedCategory == "" || searchItem.kategori == appliedCategory
     }
+
     private fun isQueryMatch(searchItem: SearchItem, query: String): Boolean {
         return searchItem.wisata?.contains(query, ignoreCase = true) == true
     }
@@ -219,95 +239,11 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
         } else {
             notFoundImageView.visibility = View.VISIBLE
             searchAdapter.setItems(emptyList())
-            resultTextView.text = "0 hasil ditemukan"
+            resultTextView.text = "Maaf, Tidak Dapat Menemukan Hasil Pencarian Anda"
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        super.onBackPressed()
-        SharedPrefManager.saveFilterPreferences(this, "Pilih Kategori", 0.0F, 0)
-        finish()
-    }
-
-    override fun onItemClick(position: Int) {
-        val searchItem = searchItemsList[position]
-        val intent = Intent(this, DetailsWisataActivity::class.java)
-        intent.putExtra("wisata", searchItem.wisata)
-        startActivity(intent)
-    }
-
-    override fun onFavoriteClick(position: Int) {
-        val searchItem = searchItemsList[position]
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        if (userId != null) {
-            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
-
-            val newFavoriteStatus = !searchItem.isFavorite
-
-            if (newFavoriteStatus) {
-                searchItem.wisata?.let {
-                    favoritesRef.child(it).setValue(true)
-                        .addOnSuccessListener {
-                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-                            imageView?.setImageResource(R.drawable.ic_favorite_true)
-                            showToast("Wisata ditambahkan ke wishlist")
-                        }
-                        .addOnFailureListener { e ->
-                            showToast("Failed to add item to favorites: ${e.message}")
-                        }
-                }
-            } else {
-                searchItem.wisata?.let {
-                    favoritesRef.child(it).setValue(false)
-                        .addOnSuccessListener {
-                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-                            imageView?.setImageResource(R.drawable.ic_favorite_false)
-                            showToast("Wisata dihapus dari wishlist")
-                        }
-                        .addOnFailureListener { e ->
-                            showToast("Failed to remove item from favorites: ${e.message}")
-                        }
-                }
-            }
-        }
-    }
-
-    private fun getFavoriteItems() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        userId?.let { uid ->
-            val favoritesRef = FirebaseDatabase.getInstance().reference.child("favorites").child(uid)
-            favoritesRef.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (childSnapshot in snapshot.children) {
-                        val itemId = childSnapshot.key
-                        val isFavorite = childSnapshot.getValue(Boolean::class.java)
-
-                        for (item in searchItemsList) {
-                            if (item.wisata == itemId) {
-                                item.isFavorite = isFavorite ?: false
-                                val position = searchItemsList.indexOf(item)
-                                val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
-
-                                if (isFavorite == true){
-                                    imageView?.setImageResource(R.drawable.ic_favorite_true)
-                                } else {
-                                    imageView?.setImageResource(R.drawable.ic_favorite_false)
-                                }
-                                break
-                            }
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    Log.e("getFavoriteItems", "Error: ${error.message}")
-                }
-            })
-        }
-    }
-    private fun setRatingTextByWisataName(wisata: String) {
+    private fun setRatingTextByWisataName(wisata: String, callback: (Double) -> Unit) {
         val databaseReference = FirebaseDatabase.getInstance().reference
         databaseReference.child("Ulasan").child(wisata).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -319,35 +255,90 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener{
                         rating?.let {
                             totalRating += it
                             totalReviews++
-                        } ?: run {
-                            Log.e("Rating", "Null value found for rating in ulasan: ${ulasanSnapshot.key}")
                         }
                     }
 
                     totalReviews = max(totalReviews, 1)
-
                     val averageRating = totalRating / totalReviews
-                    for (item in searchItemsList) {
-                        if (item.wisata == wisata) {
-                            item.rating = averageRating
-                            // Memberi tahu adapter bahwa data telah berubah
-                            searchAdapter.notifyDataSetChanged()
-                            break
-                        }
-                    }
-
-
-
+                    callback(averageRating)
+                } else {
+                    callback(0.0)
                 }
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e("Firebase", "Database error: ${error.message}")
-                // Handle error
+                callback(0.0)
             }
         })
     }
-    fun Context.showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
+    private fun getFavoriteItems() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val databaseReference = FirebaseDatabase.getInstance().getReference("Favorit").child(userId)
+            databaseReference.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (favoriteSnapshot in dataSnapshot.children) {
+                        val favoriteItem = favoriteSnapshot.getValue(SearchItem::class.java)
+                        if (favoriteItem != null) {
+                            for (searchItem in searchItemsList) {
+                                if (searchItem.wisata == favoriteItem.wisata) {
+                                    searchItem.isFavorite = true
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    searchAdapter.notifyDataSetChanged()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("Firebase", "Database error: ${databaseError.message}")
+                }
+            })
+        }
+    }
+
+    override fun onItemClick(position: Int) {
+        val item = searchItemsList[position]
+        val intent = Intent(this, DetailsWisataActivity::class.java)
+        intent.putExtra("nama", item.wisata)
+        startActivity(intent)
+    }
+
+    override fun onFavoriteClick(position: Int) {
+        val item = searchItemsList[position]
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val databaseReference = FirebaseDatabase.getInstance().getReference("Favorit").child(userId)
+            if (item.isFavorite) {
+                // Remove from favorites
+                databaseReference.child(item.wisata ?: "").removeValue()
+                    .addOnSuccessListener {
+                        item.isFavorite = false
+                        searchAdapter.notifyItemChanged(position)
+                        Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Firebase", "Error removing favorite: ${e.message}")
+                        Toast.makeText(this, "Failed to remove favorite", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                // Add to favorites
+                databaseReference.child(item.wisata ?: "").setValue(item)
+                    .addOnSuccessListener {
+                        item.isFavorite = true
+                        searchAdapter.notifyItemChanged(position)
+                        Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("Firebase", "Error adding favorite: ${e.message}")
+                        Toast.makeText(this, "Failed to add favorite", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        } else {
+            Toast.makeText(this, "You need to be logged in to use favorites", Toast.LENGTH_SHORT).show()
+        }
     }
 }

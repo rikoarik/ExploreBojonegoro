@@ -259,7 +259,7 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
                 val iconId = weatherResponse.weather[0].icon
 
                 suhutxt.text = "${temperature.toInt()} °C"
-                ketCuaca.text = getWeatherDescription(weatherDescription)
+                ketCuaca.text = weatherDescription
 
                 getIcon(iconId)
 
@@ -272,15 +272,6 @@ class HomeFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener, OnIt
             } else {
                 Log.e("Error", "Gagal mendapatkan data cuaca")
             }
-        }
-    }
-    private fun getWeatherDescription(condition: String): String {
-        return when (condition) {
-            "clear sky" -> "Langit cerah"
-            "few clouds" -> "Beberapa awan"
-            "scattered clouds" -> "Awan tersebar"
-            "broken clouds" -> "Awan pecah"
-            else -> "Kondisi cuaca tidak dikenal"
         }
     }
 
