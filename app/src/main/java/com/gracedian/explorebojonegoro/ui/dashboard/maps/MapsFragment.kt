@@ -45,7 +45,6 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.locationcomponent.location2
 import kotlin.math.max
 
@@ -60,6 +59,9 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var currentLocation: Location? = null
 
+    private var lastVisibleItem: DataSnapshot? = null
+    private var isLoading = false
+    private val pageSize = 10
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,11 +70,9 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         val view = inflater.inflate(R.layout.fragment_maps, container, false)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireContext())
         mapView = view.findViewById(R.id.mapView)
-        mapView = view.findViewById(R.id.mapView)
         mapboxMap = mapView.getMapboxMap()
 
         mapboxMap.loadStyleUri(Style.LIGHT) {
-
             pointAnnotationManager = mapView.annotations.createPointAnnotationManager()
             getDataWisataTerdekat()
         }
@@ -88,9 +88,26 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
         }
 
         rcWisataMaps = view.findViewById(R.id.rcWisataMaps)
-        rcWisataMaps.layoutManager = LinearLayoutManager(requireContext(),LinearLayoutManager.HORIZONTAL, false)
+        rcWisataMaps.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
         wisataTerdekatAdapter = WisataTerdekatAdapter(wisataTerdekatList, this)
         rcWisataMaps.adapter = wisataTerdekatAdapter
+
+        rcWisataMaps.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!isLoading) {
+                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                    val visibleItemCount = layoutManager.childCount
+                    val totalItemCount = layoutManager.itemCount
+                    val pastVisibleItems = layoutManager.findFirstVisibleItemPosition()
+
+                    if (pastVisibleItems + visibleItemCount >= totalItemCount) {
+                        getDataWisataTerdekat() // Load more data when scrolled to the end
+                    }
+                }
+            }
+        })
+
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -118,16 +135,24 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
             )
         }
 
-
         return view
     }
 
     private fun getDataWisataTerdekat() {
+        if (isLoading) return
+        isLoading = true
+
         val db = FirebaseDatabase.getInstance().getReference("objekwisata")
-        db.addValueEventListener(object : ValueEventListener {
+        val query = if (lastVisibleItem != null) {
+            db.orderByKey().startAfter(lastVisibleItem!!.key).limitToFirst(pageSize)
+        } else {
+            db.limitToFirst(pageSize)
+        }
+
+        query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
+                isLoading = false
                 if (dataSnapshot.exists()) {
-                    wisataTerdekatList.clear()
                     val currentLat = currentLocation?.latitude ?: 0.0
                     val currentLong = currentLocation?.longitude ?: 0.0
 
@@ -184,10 +209,14 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
 
                     getFavoriteItems()
                     updateRatings()
+
+                    // Update the last visible item for pagination
+                    lastVisibleItem = dataSnapshot.children.lastOrNull()
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
+                isLoading = false
                 Log.e("GetData", "Error: ${databaseError.message}")
             }
         })
@@ -222,7 +251,7 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         .addOnSuccessListener {
                             val imageView = rcWisataMaps.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_true)
-                            showToast("Item added to favorites")
+                            showToast("Wisata ditambahkan ke wishlist")
                         }
                         .addOnFailureListener { e ->
                             showToast("Failed to add item to favorites: ${e.message}")
@@ -234,7 +263,7 @@ class MapsFragment : Fragment(), WisataTerdekatAdapter.OnItemClickListener {
                         .addOnSuccessListener {
                             val imageView = rcWisataMaps.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
                             imageView?.setImageResource(R.drawable.ic_favorite_false)
-                            showToast("Item removed from favorites")
+                            showToast("Wisata dihapus dari wishlist")
                         }
                         .addOnFailureListener { e ->
                             showToast("Failed to remove item from favorites: ${e.message}")

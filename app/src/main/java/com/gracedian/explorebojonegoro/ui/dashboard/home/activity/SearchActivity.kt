@@ -273,33 +273,6 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener {
         })
     }
 
-    private fun getFavoriteItems() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId != null) {
-            val databaseReference = FirebaseDatabase.getInstance().getReference("Favorit").child(userId)
-            databaseReference.addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    for (favoriteSnapshot in dataSnapshot.children) {
-                        val favoriteItem = favoriteSnapshot.getValue(SearchItem::class.java)
-                        if (favoriteItem != null) {
-                            for (searchItem in searchItemsList) {
-                                if (searchItem.wisata == favoriteItem.wisata) {
-                                    searchItem.isFavorite = true
-                                    break
-                                }
-                            }
-                        }
-                    }
-                    searchAdapter.notifyDataSetChanged()
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("Firebase", "Database error: ${databaseError.message}")
-                }
-            })
-        }
-    }
-
     override fun onItemClick(position: Int) {
         val item = searchItemsList[position]
         val intent = Intent(this, DetailsWisataActivity::class.java)
@@ -308,37 +281,78 @@ class SearchActivity : AppCompatActivity(), SearchAdapter.OnItemClickListener {
     }
 
     override fun onFavoriteClick(position: Int) {
-        val item = searchItemsList[position]
+        val searchItem = searchItemsList[position]
         val userId = FirebaseAuth.getInstance().currentUser?.uid
+
         if (userId != null) {
-            val databaseReference = FirebaseDatabase.getInstance().getReference("Favorit").child(userId)
-            if (item.isFavorite) {
-                // Remove from favorites
-                databaseReference.child(item.wisata ?: "").removeValue()
-                    .addOnSuccessListener {
-                        item.isFavorite = false
-                        searchAdapter.notifyItemChanged(position)
-                        Toast.makeText(this, "Removed from favorites", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Firebase", "Error removing favorite: ${e.message}")
-                        Toast.makeText(this, "Failed to remove favorite", Toast.LENGTH_SHORT).show()
-                    }
+            val favoritesRef =
+                FirebaseDatabase.getInstance().reference.child("favorites").child(userId)
+
+            val newFavoriteStatus = !searchItem.isFavorite
+
+            if (newFavoriteStatus) {
+                searchItem.wisata?.let {
+                    favoritesRef.child(it).setValue(true)
+                        .addOnSuccessListener {
+                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)
+                                ?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_true)
+                            showToast("Wisata ditambahkan ke wishlist")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to add item to favorites: ${e.message}")
+                        }
+                }
             } else {
-                // Add to favorites
-                databaseReference.child(item.wisata ?: "").setValue(item)
-                    .addOnSuccessListener {
-                        item.isFavorite = true
-                        searchAdapter.notifyItemChanged(position)
-                        Toast.makeText(this, "Added to favorites", Toast.LENGTH_SHORT).show()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("Firebase", "Error adding favorite: ${e.message}")
-                        Toast.makeText(this, "Failed to add favorite", Toast.LENGTH_SHORT).show()
-                    }
+                searchItem.wisata?.let {
+                    favoritesRef.child(it).setValue(false)
+                        .addOnSuccessListener {
+                            val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)
+                                ?.findViewById<ImageView>(R.id.btFavorite)
+                            imageView?.setImageResource(R.drawable.ic_favorite_false)
+                            showToast("Wisata dihapus dari wishlist")
+                        }
+                        .addOnFailureListener { e ->
+                            showToast("Failed to remove item from favorites: ${e.message}")
+                        }
+                }
             }
-        } else {
-            Toast.makeText(this, "You need to be logged in to use favorites", Toast.LENGTH_SHORT).show()
         }
+    }
+    private fun getFavoriteItems() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        userId?.let { uid ->
+            val favoritesRef = FirebaseDatabase.getInstance().getReference("favorites").child(uid)
+            favoritesRef.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (childSnapshot in snapshot.children) {
+                        val itemId = childSnapshot.key
+                        val isFavorite = childSnapshot.getValue(Boolean::class.java)
+
+                        for (item in searchItemsList) {
+                            if (item.wisata == itemId) {
+                                item.isFavorite = isFavorite ?: false
+                                val position = searchItemsList.indexOf(item)
+                                val imageView = searchRecyclerView.layoutManager?.findViewByPosition(position)?.findViewById<ImageView>(R.id.btFavorite)
+
+                                if (isFavorite == true){
+                                    imageView?.setImageResource(R.drawable.ic_favorite_true)
+                                } else {
+                                    imageView?.setImageResource(R.drawable.ic_favorite_false)
+                                }
+                                break
+                            }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("getFavoriteItems", "Error: ${error.message}")
+                }
+            })
+        }
+    }
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 }

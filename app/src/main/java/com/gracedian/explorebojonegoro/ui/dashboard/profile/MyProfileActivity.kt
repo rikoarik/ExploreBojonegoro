@@ -2,6 +2,7 @@ package com.gracedian.explorebojonegoro.ui.dashboard.profile
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
@@ -239,6 +240,11 @@ class MyProfileActivity : AppCompatActivity() {
     }
 
     private fun saveImageToStorage(userId: String, imageUri: Uri) {
+        val progressDialog = ProgressDialog(this)
+        progressDialog.setTitle("Uploading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
         val storageReference = FirebaseStorage.getInstance().reference
         val imageRef = storageReference.child("profile_images/$userId.jpg")
 
@@ -259,11 +265,13 @@ class MyProfileActivity : AppCompatActivity() {
                 imageRef.downloadUrl.addOnSuccessListener { uri ->
                     val downloadUrl = uri.toString()
                     updateProfileWithImageDownloadURL(userId, downloadUrl)
+                    progressDialog.dismiss()
                 }
             }
             .addOnFailureListener {
                 loadingBar.visibility = View.GONE
                 Toast.makeText(this, "Gagal mengunggah gambar", Toast.LENGTH_SHORT).show()
+                progressDialog.dismiss()
             }
     }
 

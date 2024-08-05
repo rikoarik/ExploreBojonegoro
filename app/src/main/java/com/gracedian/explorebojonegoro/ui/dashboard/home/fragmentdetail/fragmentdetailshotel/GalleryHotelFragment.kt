@@ -2,6 +2,7 @@ package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail.fragmen
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -64,6 +65,11 @@ class GalleryHotelFragment : Fragment() {
     }
 
     private fun uploadImageToFirebaseStorage(imageUri: Uri) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setTitle("Uploading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
+
         val storage = FirebaseStorage.getInstance()
         val storageRef: StorageReference = storage.reference
         val namaHotel = arguments?.getString("namaHotel")
@@ -83,6 +89,7 @@ class GalleryHotelFragment : Fragment() {
                     .show()
                 galeriList.clear()
                 getImages()
+                progressDialog.dismiss()
             }
             .addOnFailureListener { exception ->
                 Toast.makeText(
@@ -90,6 +97,7 @@ class GalleryHotelFragment : Fragment() {
                     "Gagal mengunggah gambar: ${exception.message}",
                     Toast.LENGTH_SHORT
                 ).show()
+                progressDialog.dismiss()
             }
     }
 

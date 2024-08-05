@@ -1,6 +1,7 @@
 package com.gracedian.explorebojonegoro.ui.dashboard.home.fragmentdetail
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -63,6 +64,10 @@ class GaleriFragment : Fragment() {
     }
 
     private fun uploadImageToFirebaseStorage(imageUri: Uri) {
+        val progressDialog = ProgressDialog(requireContext())
+        progressDialog.setTitle("Uploading...")
+        progressDialog.setCancelable(false)
+        progressDialog.show()
         val storage = FirebaseStorage.getInstance()
         val storageRef: StorageReference = storage.reference
         val namaWisata = arguments?.getString("namaWisata")
@@ -80,8 +85,10 @@ class GaleriFragment : Fragment() {
                 Toast.makeText(requireContext(), "Berhasil mengunggah gambar", Toast.LENGTH_SHORT).show()
                 galeriList.clear()
                 getImages()
+                progressDialog.dismiss()
             }
             .addOnFailureListener { exception ->
+                progressDialog.dismiss()
                 Toast.makeText(requireContext(), "Gagal mengunggah gambar: ${exception.message}", Toast.LENGTH_SHORT).show()
             }
     }
