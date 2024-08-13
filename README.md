@@ -67,11 +67,13 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 
 ## Design Figma
 
--Prototype
+- **Prototype**
+
     ```bash
     https://www.figma.com/proto/sZXFKixzOjrGgF579ye2Ak/Explore-Bojonegoro?node-id=2-4&t=jIhdI95ZtY5U9MO5-1
     ```
--UI UX
+    
+-**UI UX**
     ```bash
     https://www.figma.com/design/sZXFKixzOjrGgF579ye2Ak/Explore-Bojonegoro?node-id=2-3&t=jIhdI95ZtY5U9MO5-1
     ```
