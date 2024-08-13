@@ -65,9 +65,20 @@ Jika Anda ingin berkontribusi pada proyek ini, silakan buat pull request atau bu
 
 Proyek ini dilisensikan di bawah [MIT License](LICENSE).
 
+## Design Figma
+
+-Prototype
+    ```bash
+    https://www.figma.com/proto/sZXFKixzOjrGgF579ye2Ak/Explore-Bojonegoro?node-id=2-4&t=jIhdI95ZtY5U9MO5-1
+    ```
+-UI UX
+    ```bash
+    https://www.figma.com/design/sZXFKixzOjrGgF579ye2Ak/Explore-Bojonegoro?node-id=2-3&t=jIhdI95ZtY5U9MO5-1
+    ```
+
 ## Kontak
 
-Jika Anda memiliki pertanyaan atau membutuhkan bantuan, silakan hubungi saya di [email@example.com](mailto:email@example.com).
+Jika Anda memiliki pertanyaan atau membutuhkan bantuan, silakan hubungi saya di [rikoarik04@gmail.com](mailto:rikoarik04@gmail.com).
 
 ---
 
