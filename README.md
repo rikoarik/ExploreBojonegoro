@@ -74,6 +74,7 @@ Proyek ini dilisensikan di bawah [MIT License](LICENSE).
     ```
     
 -**UI UX**
+
     ```bash
     https://www.figma.com/design/sZXFKixzOjrGgF579ye2Ak/Explore-Bojonegoro?node-id=2-3&t=jIhdI95ZtY5U9MO5-1
     ```
