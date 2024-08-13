@@ -26,7 +26,7 @@ Aplikasi ini merupakan aplikasi sistem informasi geografis yang dirancang untuk 
 1. Clone repositori ini:
 
     ```bash
-  
+      https://github.com/rikoarik/ExploreBojonegoro.git
     ```
 
 2. Buka proyek di Android Studio.
